@@ -28,7 +28,7 @@ If you want to explore what data are in MIMIC database without going through the
 #### 2) Query and use MIMIC data
 Once you finish the training and obtain the data access, you can download all the data files to your local computer (7-8G) or use Google BigQuery to extract the data you need. We recommend the second option which is relatively easy and efficient. 
 
-In our use case, we need to extract demographic data, lab test data (using SNOMED CT code), and medication data from patients with Leukemia (using ICD 9 Code 205.XX). We provided our query files in this repo. You can modify it based on your own use case. 
+In our use case, we need to extract demographic data, lab test data (using SNOMED CT code), and medication data from patients with Leukemia (using ICD 9 Code 205.XX). We provided our [query files](https://github.com/MaastrichtU-IDS/CVDPrediction/blob/main/mimicQuery.sql) in this repo. You can modify it based on your own use case. 
 
 #### 3) 
 
