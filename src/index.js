@@ -192,6 +192,7 @@ getWebId().then(webId => {
 
     const homeMessageElement = document.getElementById("homeMessage");
     if (webId) {
+        console.log(window.location.pathname)
         if (window.location.pathname == "/dist/cmllogin.html") { window.location.href = "/dist/cmlconsent.html"; }
         if (homeMessageElement) { homeMessageElement.textContent = "Welcome! " + webId; }
 
