@@ -192,11 +192,11 @@ getWebId().then(webId => {
 
     const homeMessageElement = document.getElementById("homeMessage");
     if (webId) {
-        console.log(window.location.pathname)
-        if (window.location.pathname == "/CVDPrediction/dist/cmllogin.html") { window.location.href = "/CVDPrediction/dist/cmlconsent.html"; }
+        let currentPath = window.location.pathname.toString().split("dist/");
+        if (currentPath[1] === "cmllogin.html") { window.location.href = currentPath[0] + "dist/cmlconsent.html"; }
         if (homeMessageElement) { homeMessageElement.textContent = "Welcome! " + webId; }
 
-        if (window.location.pathname == "/CVDPrediction/dist/cmlconsent.html") {
+        if (currentPath[1] === "cmlconsent.html") {
             document.getElementById("logStatusPage").textContent = "Log Out";
             document.getElementById("logStatusFollowing").textContent = "Log Out";
         }
