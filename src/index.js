@@ -192,11 +192,13 @@ getWebId().then(webId => {
 
     const homeMessageElement = document.getElementById("homeMessage");
     if (webId) {
-        if (window.location.pathname == "/dist/cmllogin.html") { window.location.href = "cmlconsent.html"; }
+        if (window.location.pathname == "/dist/cmllogin.html") { window.location.href = "/dist/cmlconsent.html"; }
         if (homeMessageElement) { homeMessageElement.textContent = "Welcome! " + webId; }
 
-        document.getElementById("logStatusPage").textContent = "Log Out";
-        document.getElementById("logStatusFollowing").textContent = "Log Out";
+        if (window.location.pathname == "/dist/cmlconsent.html") {
+            document.getElementById("logStatusPage").textContent = "Log Out";
+            document.getElementById("logStatusFollowing").textContent = "Log Out";
+        }
 
         // ***** Log out ***** //
         btn_login.forEach(function (btn) {
