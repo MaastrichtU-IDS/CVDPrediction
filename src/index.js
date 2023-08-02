@@ -23,6 +23,7 @@ var userRegisterRef = "https://chang.inrupt.net/registerlist/userregister.ttl";
 var dataFileName = "healthrecord.ttl";
 
 // Global terminology
+var requestTitleLabelGlobal = "http://schema.org/title";
 var requestPurposeClassGlobal = "http://www.w3.org/ns/dpv#hasPurpose";
 var requestPurposeLabelGlobal = "http://www.w3.org/2000/01/rdf-schema#label";
 var requestDataCategoryGlobal = "http://www.w3.org/ns/dpv#hasPersonalDataCategory";
@@ -72,13 +73,14 @@ if (page === "cmlparticipate.html") {
                 const participant_webID = session.webId;
                 const participant_dataFile = participant_webID.split("profile/card#")[0] + "private/" + dataFileName;
                 const participant_basket = []
-
+   
+                
                 fetchRequestURL(participant_dataFile).then(fetchedParticipantDataFileRef => {
                     const participant_triple = fetchedParticipantDataFileRef.getTriples()
                     participant_triple.forEach(eachDataItem => {
                         participant_basket.push(eachDataItem.predicate.id);
                     });
-
+            
                     plotCardsOnPage(requestWebIdDocList, requestProfileIdList, requestURIList, "fromPageEntrance", "participant", session, participant_basket).then(outcome => {
                         respondToRequest(outcome[0], outcome[1]);
                     });
@@ -91,7 +93,7 @@ if (page === "cmlparticipate.html") {
     // Fetch data from the files all triples or objects
 
 
-    var fetchFrom = "https://janjansen.solidcommunity.net/private/healthrecord.ttl"//document.getElementById("fetchFromTriples").value;
+    var fetchFrom = "https://janjansen.solidcommunity.net/private/healthrecordforpatient.ttl"//document.getElementById("fetchFromTriples").value;
 
 
     const fetchSubject = "https://janjansen.solidcommunity.net/profile/card#me"//document.getElementById("fetchSubject").value;
@@ -196,10 +198,10 @@ getWebId().then(webId => {
         if (currentPath[1] === "cmllogin.html") { window.location.href = currentPath[0] + "dist/cmlconsent.html"; }
         if (homeMessageElement) { homeMessageElement.textContent = "Welcome! " + webId; }
 
-        if (currentPath[1] === "cmlconsent.html") {
-            document.getElementById("logStatusPage").textContent = "Log Out";
-            document.getElementById("logStatusFollowing").textContent = "Log Out";
-        }
+        //if (currentPath[1] === "cmlconsent.html") {
+        document.getElementById("logStatusPage").textContent = "Log Out";
+        document.getElementById("logStatusFollowing").textContent = "Log Out";
+        //}
 
         // ***** Log out ***** //
         btn_login.forEach(function (btn) {
@@ -556,6 +558,8 @@ async function addRequest(fetchProfile, content, requestList) {
         newDataElement.addRef(schema.creator, fetchProfile);
         newDataElement.addRef(requestDataControllerGlobal, fetchProfile);
 
+        if (content.title) { newDataElement.addString(requestTitleLabelGlobal, content.title); }
+
         if (content.purposeClass) {
             for (let i = 0; i < content.purposeClass.length; i++) {
                 newDataElement.addRef(requestPurposeClassGlobal, content.purposeClass[i]);
@@ -641,6 +645,8 @@ function saveRequestLocally(newDataElement, content, fetchProfile, createdDate) 
     // requestTripleString += `<${subject}> <${schema.dateCreated}> ${formatTime(createdDate)}.`; //${createdDate.toString().split(" (")[0]}
     // requestTripleString += `<${subject}> <${schema.endDate}> ${formatTime(content.period)}.`;//${content.period.toString().split(" (")[0]}
     requestTripleString += `<${subject}> <http://schema.org/purpose> ${content.purpose}.`;
+    requestTripleString += `<${subject}> <http://schema.org/title> ${content.title}.`;
+
     if (content.data) {
         let sort_content_data = content.data.sort()
         for (let i = 0; i < content.data.length; i++) {
@@ -748,7 +754,7 @@ async function addParticipation(fetchProfile, requestList, participateRequestId,
             responseUserExisted = true;
         }
     }
-
+    
     if (responseSize <= collectionSize) {
         if (responseDate <= endDate) {
             if (!responseUserExisted) {
@@ -759,6 +765,7 @@ async function addParticipation(fetchProfile, requestList, participateRequestId,
                         const userRegisterKeyDoc = await fetchDocument(userRegisterKeyRef);
                         const userRegisterKeyTriples = userRegisterKeyDoc.getTriples();
                         let privateKey = "";
+                        
                         for (let i = 0; i < userRegisterKeyTriples.length; i++) {
                             if (userRegisterKeyTriples[i].predicate.id == "http://schema.org/hasCredential") {
                                 privateKey = decodeBase64(userRegisterKeyTriples[i].object.value);
@@ -793,36 +800,58 @@ async function addParticipation(fetchProfile, requestList, participateRequestId,
     //                        /* 1. Check if a participation register list already exists. */
                             const registerIndex = await fetchDocument(registerIndexRef);
                             const registerIndexEntryList = registerIndex.getSubject(registerRequestResponseFileURL).getRef(rdf.type);
+                            
 
+                            //Disabled because cauzing errors
                             /* 2. If it doesn't exist, create it. */
                             if (!registerIndexEntryList) {
 
                                 // Create the new Document
-                                solid.data[registerRequestResponseFileURL].put()
+                                //solid.data[registerRequestResponseFileURL].put()
+              
+                                await createDocument(registerRequestResponseFileURL).save();
 
+                        
                                 // Add record in the registerIndex.ttL
-                                await solid.data[registerIndexRef + '#' + participateRequestId.split('#')[1]]["http://schema.org/RegisterAction"].add(namedNode(registerRequestResponseFileURL));
+                                // solid.add doesn't work, have to do it manually.
+                                //await solid.data[registerIndexRef + '#' + participateRequestId.split('#')[1]]["http://schema.org/RegisterAction"].add(namedNode(registerRequestResponseFileURL));
                             }
 
     //                        // 3. If it exists, add participation record in registerParticipation.ttl
-                            const addSubjectID = newParticipateDataElement.asRef().split('#')[1];
+                            console.log(registerIndexEntryList)
+                            const registerIndexEntryInput = registerIndex.addSubject();
+                            registerIndexEntryInput.addRef(rdf.type, joinActionGlobal);
+                            registerIndexEntryInput.addRef(rdf.type, joinConsentGlobal);
 
-                            await solid.data[registerRequestResponseFileURL + '#' + addSubjectID][rdf.type].add(namedNode(joinActionGlobal));
-                            await solid.data[registerRequestResponseFileURL + '#' + addSubjectID][rdf.type].add(namedNode(joinConsentGlobal));
-                            await solid.data[registerRequestResponseFileURL + '#' + addSubjectID][joinDataSubjectGlobal].add(namedNode(fetchProfile));
-                            await solid.data[registerRequestResponseFileURL + '#' + addSubjectID][joinConsentNoticeGlobal].add(namedNode(participateRequestId));
-                            const currentDateTime = new Date(Date.now())
-                            await solid.data[registerRequestResponseFileURL + '#' + addSubjectID][joinDataCreatedGlobal].add(literal(currentDateTime.toISOString(), "http://www.w3.org/2001/XMLSchema#dateTime"));
-                            await solid.data[registerRequestResponseFileURL + '#' + addSubjectID][joinhasProvisionTimeGlobal].add(literal(currentDateTime.toISOString(), "http://www.w3.org/2001/XMLSchema#dateTime"));
-                            //await data[registerRequestResponseFileURL + '#' + addSubjectID][joinhasProvisionMethodGlobal].add(namedNode("https://sunchang0124.github.io/dist/participate.html"));
-                            await solid.data[registerRequestResponseFileURL + '#' + addSubjectID][joinhasWithdrawalTimeGlobal].add(literal(participate_period.toISOString(), "http://www.w3.org/2001/XMLSchema#dateTime"));
-                            await solid.data[registerRequestResponseFileURL + '#' + addSubjectID][joinDataRecipientGlobal].add(namedNode(data_recipient));
-                            await solid.data[registerRequestResponseFileURL + '#' + addSubjectID][joinhasExpiryGlobal].add(namedNode(expiry_single));
-                            await solid.data[registerRequestResponseFileURL + '#' + addSubjectID][joinhasExpiryTimeGlobal].add(namedNode("http://www.w3.org/2001/XMLSchema#dateTime"));
+                            registerIndexEntryInput.addRef(joinDataSubjectGlobal, fetchProfile);
+                            registerIndexEntryInput.addRef(joinConsentNoticeGlobal, participateRequestId);
+                            registerIndexEntryInput.addDateTime(joinDataCreatedGlobal, new Date(Date.now()));
+                            registerIndexEntryInput.addDateTime(joinhasProvisionTimeGlobal, new Date(Date.now()));
+                            registerIndexEntryInput.addDateTime(joinhasWithdrawalTimeGlobal, participate_period);
+                            registerIndexEntryInput.addRef(joinDataRecipientGlobal, data_recipient);
+                            registerIndexEntryInput.addRef(joinhasExpiryGlobal, expiry_single);
+                            registerIndexEntryInput.addDateTime(joinhasExpiryTimeGlobal, endDate);
+
+
+                            // solid.data package is not working //
+                            //const addSubjectID = newParticipateDataElement.asRef().split('#')[1];
+                       
+                            //await solid.data[registerRequestResponseFileURL + '#' + addSubjectID][rdf.type].add(namedNode(joinActionGlobal));
+                            //await solid.data[registerRequestResponseFileURL + '#' + addSubjectID][rdf.type].add(namedNode(joinConsentGlobal));
+                            //await solid.data[registerRequestResponseFileURL + '#' + addSubjectID][joinDataSubjectGlobal].add(namedNode(fetchProfile));
+                            //await solid.data[registerRequestResponseFileURL + '#' + addSubjectID][joinConsentNoticeGlobal].add(namedNode(participateRequestId));
+                            //const currentDateTime = new Date(Date.now())
+                            //await solid.data[registerRequestResponseFileURL + '#' + addSubjectID][joinDataCreatedGlobal].add(literal(currentDateTime.toISOString(), "http://www.w3.org/2001/XMLSchema#dateTime"));
+                            //await solid.data[registerRequestResponseFileURL + '#' + addSubjectID][joinhasProvisionTimeGlobal].add(literal(currentDateTime.toISOString(), "http://www.w3.org/2001/XMLSchema#dateTime"));
+                            ////await data[registerRequestResponseFileURL + '#' + addSubjectID][joinhasProvisionMethodGlobal].add(namedNode("https://sunchang0124.github.io/dist/participate.html"));
+                            //await solid.data[registerRequestResponseFileURL + '#' + addSubjectID][joinhasWithdrawalTimeGlobal].add(literal(participate_period.toISOString(), "http://www.w3.org/2001/XMLSchema#dateTime"));
+                            //await solid.data[registerRequestResponseFileURL + '#' + addSubjectID][joinDataRecipientGlobal].add(namedNode(data_recipient));
+                            //await solid.data[registerRequestResponseFileURL + '#' + addSubjectID][joinhasExpiryGlobal].add(namedNode(expiry_single));
+                            //await solid.data[registerRequestResponseFileURL + '#' + addSubjectID][joinhasExpiryTimeGlobal].add(namedNode("http://www.w3.org/2001/XMLSchema#dateTime"));
 
                             const signature = sign.detached(decodeUTF8(participateRequestId.split('#')[1]), privateKey);
 
-                            const addedData = await solid.data[registerRequestResponseFileURL + '#' + addSubjectID][schema.validIn].add(literal(encodeBase64(signature)));
+                            //const addedData = await solid.data[registerRequestResponseFileURL + '#' + addSubjectID][schema.validIn].add(literal(encodeBase64(signature)));
 
                             await participateList.save([newParticipateDataElement]);
 
@@ -883,51 +912,58 @@ function writeAllRequest(profile, requestTriples, fetchRequest) {
     // let ontologyList = []
 
     for (let i = 0; i < requestTriples.length; i++) {
-        if (requestTriples[i].subject.id === fetchRequest) {
-            requestContent.webid = profile.asRef();
-            requestContent.name = profile.getString(foaf.name);
-            requestContent.organization = profile.getString("http://www.w3.org/2006/vcard/ns#organization-name");
-            requestContent.image = profile.getRef(vcard.hasPhoto);
+        //if (requestTriples[i].object.value >= new Date(Date.now())) {
+   
+            if (requestTriples[i].subject.id === fetchRequest) {
+                requestContent.webid = profile.asRef();
+                requestContent.name = profile.getString(foaf.name);
+                requestContent.organization = profile.getString("http://www.w3.org/2006/vcard/ns#organization-name");
+                requestContent.image = profile.getRef(vcard.hasPhoto);
 
-            requestContent.url = fetchRequest;
-            if (requestTriples[i].predicate.id === requestPurposeClassGlobal) {
-                purposeClassList.push(requestTriples[i].object.value);
+                requestContent.url = fetchRequest;
+                if (requestTriples[i].predicate.id === requestPurposeClassGlobal) {
+                    purposeClassList.push(requestTriples[i].object.value);
+                }
+                // requestContent.purposeClass = "Class of purpose: "+ requestTriples[i].object.value;}
+                if (requestTriples[i].predicate.id === requestTitleLabelGlobal) {
+                    requestContent.title = requestTriples[i].object.value;
+                }
+                if (requestTriples[i].predicate.id === requestPurposeLabelGlobal) {
+                    requestContent.purpose = requestTriples[i].object.value;
+                }
+                if (requestTriples[i].predicate.id === requestDataCategoryGlobal) {
+                    personalDataCategoryList.push(requestTriples[i].object.value);
+                }
+                if (requestTriples[i].predicate.id === requestDataProcessGlobal) {
+                    dataProcessingCategoryList.push(requestTriples[i].object.value);
+                }
+                // if (requestTriples[i].predicate.id === requestOntologyGlobal){
+                //   ontologyList.push(requestTriples[i].object.value);}
+                if (requestTriples[i].predicate.id === requestExpiryGlobal) {
+                    requestContent.period = "End date: " + requestTriples[i].object.value;
+                }
+                // requestContent.period = "End date: " + "2025-01-01"}
+                if (requestTriples[i].predicate.id === requestAnalysisLogicGlobal) {
+                    requestContent.analysis = "Analysis: " + requestTriples[i].object.value;
+                }
+                if (requestTriples[i].predicate.id === requestCollectionSizeGlobal) {
+                    requestContent.numInstance = requestTriples[i].object.value;
+                }
+                // if (requestTriples[i].predicate.id === requestRecipientGlobal){
+                //   requestContent.recipient = "Data Recipient: " + requestTriples[i].object.value;}
+                if (requestTriples[i].predicate.id === requestConsequenceGlobal) {
+                    requestContent.consequence = "Consequence of data process: " + requestTriples[i].object.value;
+                }
+                if (requestTriples[i].predicate.id === requestDataElementGlobal) {
+                    dataElementList.push(requestTriples[i].object.value);
+                }
             }
-            // requestContent.purposeClass = "Class of purpose: "+ requestTriples[i].object.value;}
-            if (requestTriples[i].predicate.id === requestPurposeLabelGlobal) {
-                requestContent.purpose = "Purpose: " + requestTriples[i].object.value;
-            }
-            if (requestTriples[i].predicate.id === requestDataCategoryGlobal) {
-                personalDataCategoryList.push(requestTriples[i].object.value);
-            }
-            if (requestTriples[i].predicate.id === requestDataProcessGlobal) {
-                dataProcessingCategoryList.push(requestTriples[i].object.value);
-            }
-            // if (requestTriples[i].predicate.id === requestOntologyGlobal){
-            //   ontologyList.push(requestTriples[i].object.value);}
-             if (requestTriples[i].predicate.id === requestExpiryGlobal){
-               requestContent.period = "End date: " + requestTriples[i].object.value;}
-            // requestContent.period = "End date: " + "2025-01-01"}
-            if (requestTriples[i].predicate.id === requestAnalysisLogicGlobal) {
-                requestContent.analysis = "Analysis: " + requestTriples[i].object.value;
-            }
-            if (requestTriples[i].predicate.id === requestCollectionSizeGlobal) {
-                requestContent.numInstance = requestTriples[i].object.value;
-            }
-            // if (requestTriples[i].predicate.id === requestRecipientGlobal){
-            //   requestContent.recipient = "Data Recipient: " + requestTriples[i].object.value;}
-            if (requestTriples[i].predicate.id === requestConsequenceGlobal) {
-                requestContent.consequence = "Consequence of data process: " + requestTriples[i].object.value;
-            }
-            if (requestTriples[i].predicate.id === requestDataElementGlobal) {
-                dataElementList.push(requestTriples[i].object.value);
-            }
-        }
-        requestContent.purposeClass = "Class of purpose: " + purposeClassList;
-        requestContent.personalDataCategory = "Personal data categories: " + personalDataCategoryList;
-        requestContent.dataProcessingCategory = "Data processing categories: " + dataProcessingCategoryList;
-        // requestContent.ontology = ontologyList;
-        requestContent.dataElement = "Requested data: " + dataElementList;
+            requestContent.purposeClass = "Class of purpose: " + purposeClassList;
+            requestContent.personalDataCategory = "Personal data categories: " + personalDataCategoryList;
+            requestContent.dataProcessingCategory = "Data processing categories: " + dataProcessingCategoryList;
+            // requestContent.ontology = ontologyList;
+            requestContent.dataElement = "Requested data: " + dataElementList;
+        //}
     }
     if (Object.keys(requestContent).length < 2) {
         requestContent = false;
@@ -973,8 +1009,8 @@ async function generateCards(requestContentList, userRole, session, participant_
         div_label.textContent = purpose_label_content;
         document.getElementById('cardID' + i.toString()).appendChild(div_label);
 
-        const div_content = document.createElement("a");
-        div_content.href = requestContentList[i].url;
+        const div_content = document.createElement("div");
+        //div_content.href = requestContentList[i].url;
         div_content.className = "content";
         div_content.id = "contentID" + i.toString();
         document.getElementById('cardID' + i.toString()).appendChild(div_content);
@@ -985,16 +1021,18 @@ async function generateCards(requestContentList, userRole, session, participant_
         div_img.id = "imgID" + i.toString();
         document.getElementById('contentID' + i.toString()).appendChild(div_img);
 
-        const div_header = document.createElement("div");
+        const div_header = document.createElement("a");
         div_header.className = "header";
         div_header.id = "headerID" + i.toString();
-        div_header.textContent = requestContentList[i].name; //"Chang Sun"
+        div_header.textContent = requestContentList[i].title //"Title of research"
+        div_header.href = requestContentList[i].url
         document.getElementById('contentID' + i.toString()).appendChild(div_header);
 
         const div_meta = document.createElement("div");
-        div_meta.className = "meta";
+        div_meta.className = "description";
         div_meta.id = "metaID" + i.toString();
-        div_meta.textContent = requestContentList[i].organization; //"IDS";
+        div_meta.textContent = "Requested by " + requestContentList[i].name + " from " + requestContentList[i].organization; //"IDS";
+        div_meta.href = requestContentList[i].url.toString().split("/public/")[0] + "/profile/card#me"
         document.getElementById('contentID' + i.toString()).appendChild(div_meta);
 
         const div_classPurpose = document.createElement("div");
@@ -1027,6 +1065,7 @@ async function generateCards(requestContentList, userRole, session, participant_
                 div_endPurpose.textContent = "... ... " + (listofpurpose.length - 3).toString() + " more classes of purpose";
                 document.getElementById('classPurposeID' + i.toString()).appendChild(div_endPurpose);
             }
+
         }
 
 
@@ -1036,7 +1075,7 @@ async function generateCards(requestContentList, userRole, session, participant_
         const div_description = document.createElement("div");
         div_description.className = "description";
         div_description.id = "descriptionID" + i.toString();
-        div_description.textContent = requestContentList[i].purpose; //"Purpose";
+        div_description.textContent = "Study / data request description: " + requestContentList[i].purpose; //"Purpose description";
         document.getElementById('contentID' + i.toString()).appendChild(div_description);
 
         const div_personalDataCategory = document.createElement("div");
@@ -1097,7 +1136,7 @@ async function generateCards(requestContentList, userRole, session, participant_
             }
             if (listofdataProcessingCategory.length > 3 && itr == 2) {
                 const div_endDataProcessing = document.createElement("div");
-                div_endDataProcessing.textContent = "... ... " + (listofdataProcessingCategory.length - 3).toString() + " more data elements"; //"period";
+                div_endDataProcessing.textContent = "... ... " + (listofdataProcessingCategory.length - 3).toString() + " more elements"; //"period";
                 document.getElementById('div_dataProcessingCategoryID' + i.toString()).appendChild(div_endDataProcessing);
             }
         }
@@ -1120,10 +1159,11 @@ async function generateCards(requestContentList, userRole, session, participant_
         //href_dataElement_0.href = listofElement[0].toString().split(": ")[1];
         //document.getElementById('contentID' + i.toString()).appendChild(href_dataElement_0);
 
+        console.log(listofElement.length)
+        if (listofElement.length <= 5) {
 
-        for (let itr = 1; itr < 5; itr++) {
-            if (itr < listofElement.length) {
-                document.getElementById('contentID' + i.toString()).appendChild(document.createElement("div"));
+            for (let itr = 1; itr < 5; itr++) {
+                const div_dataElement = document.getElementById('contentID' + i.toString()).appendChild(document.createElement("div"));
                 let href_dataElement = document.createElement("a");
 
                 let displayLabel = await getDataLabels(listofElement[itr].toString().split("/").pop())
@@ -1133,12 +1173,61 @@ async function generateCards(requestContentList, userRole, session, participant_
                 href_dataElement.href = listofElement[itr];
                 document.getElementById('contentID' + i.toString()).appendChild(href_dataElement);
             }
-            if (listofElement.length > 5 && itr == 4) {
-                const div_endElement = document.createElement("div");
-                div_endElement.textContent = "... ... " + (listofElement.length - 5).toString() + " more data elements"; //"period";
-                document.getElementById('contentID' + i.toString()).appendChild(div_endElement);
+
+        }
+        else if (listofElement.length > 5) {
+            
+            for (let itr = 1; itr < 5; itr++) {
+                const div_dataElement = document.getElementById('contentID' + i.toString()).appendChild(document.createElement("div"));
+                let href_dataElement = document.createElement("a");
+
+                let displayLabel = await getDataLabels(listofElement[itr].toString().split("/").pop())
+                // let linkText = document.createTextNode(listofElement[itr].toString().split("//")[1]);
+                let linkText = document.createTextNode(displayLabel)
+                href_dataElement.appendChild(linkText);
+                href_dataElement.href = listofElement[itr];
+                document.getElementById('contentID' + i.toString()).appendChild(href_dataElement);
+            }
+
+            const div_endElement = document.createElement("div");//document.getElementById('contentID' + i.toString()).appendChild(document.createElement("div"));
+            div_endElement.id = "dropdown_option" + i.toString();
+            div_endElement.className = "ui floating dropdown error";
+            div_endElement.textContent = "... ... " + (listofElement.length - 5).toString() + " more data elements"; //"period";
+            document.getElementById('contentID' + i.toString()).appendChild(div_endElement);
+
+            const dropdown_icon = document.createElement("i");
+            dropdown_icon.className = "dropdown icon";
+            document.getElementById('dropdown_option' + i.toString()).appendChild(dropdown_icon);
+
+            const dropdown_menu = document.getElementById('dropdown_option' + i.toString()).appendChild(document.createElement("div"));
+            dropdown_menu.className = "menu";
+            dropdown_menu.id = "menu" + + i.toString();
+            document.getElementById('dropdown_option' + i.toString()).appendChild(dropdown_menu);
+
+            for (let itr = 5; itr < listofElement.length; itr++) {
+                let dropdown_option = document.getElementById('menu' + i.toString()).appendChild(document.createElement("a"));
+                dropdown_option.className = "item";
+                let displayLabel = await getDataLabels(listofElement[itr].toString().split("/").pop())
+                // let linkText = document.createTextNode(listofElement[itr].toString().split("//")[1]);
+                let linkText = document.createTextNode(displayLabel)
+                dropdown_option.appendChild(linkText);
+                dropdown_option.href = listofElement[itr];
+                document.getElementById('menu' + i.toString()).appendChild(dropdown_option);
+
             }
         }
+
+        $('.link.example .dropdown')
+            .dropdown({
+                action: 'hide'
+            })
+            ;
+        $('.ui.dropdown')
+            .dropdown()
+            ;
+
+
+
 
         const div_period = document.createElement("div");
         div_period.className = "description";
@@ -1177,9 +1266,12 @@ async function generateCards(requestContentList, userRole, session, participant_
 
         if (userRole === "participant") {
 
-            if (session) {
-                const haveData = participant_basket.some(r => listofElement.includes(r))
+            if (session.webId.length > 5) {
 
+                // Hard coding here for CML project
+                const haveData = true// participant_basket.some(r => listofElement.includes(r))
+
+                
                 if (haveData) {
 
                     const div_untilDate_des = document.createElement("div");
@@ -1421,6 +1513,7 @@ async function generateCards(requestContentList, userRole, session, participant_
 
 // *** Plot cards on the webpage (START) ***//
 async function plotCardsOnPage(webIdDoc, profileWebID, findAllSubjects, option, userRole, session, participant_basket) {
+    
     var requestContentList = [];
 
     if (option === "fromPageEntrance") {
@@ -1512,12 +1605,14 @@ function respondToRequest(answer_btns, requestContentList) {
                             // if the data request is in the regular analysis mode
                             if (requestModel) {
                                 const aclDocument = webId.split("profile")[0] + "private/" + dataFileName + ".acl"
-                                fetchRequestURL(aclDocument).then(AccessControlList => {
 
+                                // Disable the grant access step here for CML project
+                                fetchRequestURL(aclDocument).then(AccessControlList => {
+                                  
                                     addParticipation(webId, fetchedRequestListRef, fetchParticipateRequestId, fetchedParticipateListRef, AccessControlList, collectionSize, endDate, participate_period, data_recipient, false).then(success => { //requestModel.includes('Privacy')
-                                //        if (success) {
-                                //            alert("Your participation is recorded. Access to your " + dataFileName + " is granted for this research request.");
-                                //        }
+                                        if (success) {
+                                            alert("Your participation is recorded. Access to your " + dataFileName + " is granted for this research request.");
+                                        }
                                     }).catch((err) => { alert(err.message); });;
                                 }).catch(() => { alert("If you have not given this SOLID App 'Control' Access, please turn on specific sharing for your " + dataFileName + " file ."); });
                             }
@@ -1688,16 +1783,17 @@ btns.forEach(function (btn) {
             });
         }
 
+        // Add requested data elements
         else if (styles.contains('addRequestedData')) {
 
-            if (!document.getElementById("loader") && document.getElementById("input_purpose").value.length > 0) {
+            if (!document.getElementById("loader") && document.getElementById("addTriplePredicate").value.length > 2) {
                 const loader = document.createElement("div");
                 loader.className = "ui active inline loader";
                 loader.id = "loader"
                 document.getElementById('input_addedField').appendChild(loader);
             }
 
-            if (document.getElementById("loader").className == "ui active inline loader") {
+            if  (document.getElementById("loader").className == "ui active inline loader") {
                 dataElement_getRecommender(document.getElementById("input_purpose").value).then(asInputOntology => {
                     let dataCategoryInput = document.getElementById("input_personaldatacategory").value.split(',');
                     let annotatorInput = '';
@@ -1718,7 +1814,6 @@ btns.forEach(function (btn) {
                             dataElement_getUsers(annotator, document.getElementById("addTriplePredicate").value).then(data => {
                                 if (data['collection'].length > 0) {
                                     item.push(data['collection']);
-                                    console.log(data['collection'])
                                 }
                             }).catch(e => { })
                         })
@@ -1736,7 +1831,12 @@ btns.forEach(function (btn) {
                 }
                 const request_data_list = addRequestedDataMessage.textContent.split('\r\n')
                 request_data_list.pop()
+
+                document.getElementById("loader").style.display = "none";
+                document.getElementById("addTriplePredicate").value = "";
+
             }
+
         }
 
         // Submit a new data request 
@@ -1748,6 +1848,8 @@ btns.forEach(function (btn) {
                 const request_classPurpose = document.getElementById("input_classPurpose").value.split(',');
 
                 const request_purpose = document.getElementById("input_purpose").value;
+
+                const request_title = document.getElementById("input_title").value;
 
                 const request_personalDataCategory = document.getElementById("input_personaldatacategory").value.split(',');
 
@@ -1763,7 +1865,7 @@ btns.forEach(function (btn) {
                 const request_dataProcessingCategory = document.getElementById("input_dataProcessingCategory").value.split(',');
 
                 const request_selectModelObj = document.getElementById("input_model")
-                const request_model = request_selectModelObj.options[request_selectModelObj.selectedIndex].value;
+                const request_model = document.getElementById("input_model").value;//request_selectModelObj.options[request_selectModelObj.selectedIndex].value;
 
                 const request_consequence = document.getElementById("input_consequence").value;
 
@@ -1774,6 +1876,7 @@ btns.forEach(function (btn) {
 
                 const addRequestContent = {
                     'purposeClass': request_classPurpose,
+                    'title' : request_title,
                     'purpose': request_purpose,
                     'personalDataCategory': request_personalDataCategory,
                     // 'ontology': request_ontology,
