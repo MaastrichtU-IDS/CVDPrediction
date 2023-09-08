@@ -1573,7 +1573,9 @@ function respondToRequest(answer_btns, requestContentList) {
                 const fetchParticipateRequestId = selectedRequest.url;
 
                 fetchRequestURL(fetchParticipateRequestId).then(fetchedRequestListRef => {
-                    change_participation(fetchedRequestListRef, fetchParticipateRequestId, "http://www.w3.org/ns/dpv#consented").then(()=> {}); //alert('You have accepted the request!')
+                    change_participation(fetchedRequestListRef, fetchParticipateRequestId, "http://www.w3.org/ns/dpv#consented").then(()=> {
+                        if(!alert('You have accepted the request!')){window.location.reload(); }
+                    }); //
                 });
 
                 
@@ -1582,14 +1584,18 @@ function respondToRequest(answer_btns, requestContentList) {
                 const fetchParticipateRequestId = selectedRequest.url;
 
                 fetchRequestURL(fetchParticipateRequestId).then(fetchedRequestListRef => {
-                    change_participation(fetchedRequestListRef, fetchParticipateRequestId, "http://www.w3.org/ns/dpv#declined").then(()=> {}); //alert('You have declined the request!')
+                    change_participation(fetchedRequestListRef, fetchParticipateRequestId, "http://www.w3.org/ns/dpv#declined").then(()=> {
+                        if(!alert('You have declined the request!')){window.location.reload(); }
+                    }); //alert('You have declined the request!')
                 });
             }
             else if (style.contains('cancel')) { //sendFeedback
                 const fetchParticipateRequestId = selectedRequest.url;
 
                 fetchRequestURL(fetchParticipateRequestId).then(fetchedRequestListRef => {
-                    change_participation(fetchedRequestListRef, fetchParticipateRequestId, "http://www.w3.org/ns/dpv#open").then(()=> {}); //alert('You have declined the request!')
+                    change_participation(fetchedRequestListRef, fetchParticipateRequestId, "http://www.w3.org/ns/dpv#open").then(()=> {
+                        if(!alert('You have withdrawed the decision!')){window.location.reload(); }
+                    }); //alert('You have declined the request!')
                 });
 
                
