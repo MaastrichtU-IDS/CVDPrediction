@@ -25,6 +25,8 @@
     <link rel="stylesheet" type="text/css" href="../semantic/dist/components/modal.css">
     <link rel="stylesheet" type="text/css" href="../semantic/dist/components/loader.css">
     <link rel="stylesheet" type="text/css" href="../semantic/dist/components/step.css">
+    <link rel="stylesheet" type="text/css" href="../semantic/dist/components/checkbox.css">
+
 
     <link rel="stylesheet" type="text/css" href="../semantic/dist/components/divider.css">
     <link rel="stylesheet" type="text/css" href="../semantic/dist/components/dropdown.css">
@@ -36,6 +38,7 @@
     <link rel="stylesheet" type="text/css" href="../semantic/dist/components/transition.css">
     <link rel="stylesheet" type="text/css" href="../semantic/dist/components/popup.css">
     <link rel="stylesheet" type="text/css" href="../semantic/dist/components/dimmer.css">
+
 
 
     <style type="text/css">
@@ -157,6 +160,7 @@
     <script src="../semantic/dist/components/modal.js"></script>
     <script src="../semantic/dist/components/dimmer.js"></script>
     <script src="../semantic/dist/components/dropdown.js"></script>
+    <script src="../semantic/dist/components/checkbox.js"></script>
 
     <script>$(document)
             .ready(function () {
@@ -204,12 +208,12 @@
 <div class="ui large top fixed hidden menu">
     <div class="ui container">
         <a class="item" href="cmlconsent.html">Home</a>
-        <a class="item" href="cmlfetch.html">View my Data</a>
+        <!-- <a class="item" href="cmlfetch.html">View my Data</a> -->
         <a class="active item" href="cmlparticipate.html">Contribute to studies</a>
         <a class="item" href="cmlrequest.html">Ask for Consent [Researcher portal]</a>
         <div class="right menu">
             <div class="item">
-                <a class="ui primary login button" href="cmllogin.html" id="logStatusFollowing">Log in</a>
+                <a class="ui primary login button" href="cmllogin.html" id="logStatusFollowing">Log out</a>
             </div>
         </div>
     </div>
@@ -224,11 +228,11 @@
                 <i class="sidebar icon"></i>
             </a>
             <a class="item" href="cmlconsent.html">Home</a>
-            <a class="item" href="cmlfetch.html">View my Data</a>
+            <!-- <a class="item" href="cmlfetch.html">View my Data</a> -->
             <a class="active item" href="cmlparticipate.html">Contribute to studies</a>
             <a class="item" href="cmlrequest.html">Ask for Consent [Researcher portal]</a>
             <div class="right item">
-                <a class="ui inverted login button" href="cmllogin.html"><span id="logStatusPage">Log in</span></a>
+                <a class="ui inverted login button" href="cmllogin.html"><span id="logStatusPage">Log out</span></a>
             </div>
         </div>
     </div>
@@ -245,7 +249,8 @@
 
   <div class="ui vertical stripe segment">
       <div class="ui container">
-          <h3 class="ui header center aligned">Ongoing digital consent for requesting data</h3>
+          <h3 class="ui header center aligned">Onging studies asking for your consent</h3>
+          <h4 class="ui teal header center aligned">!! Refresh the page after you take actions to the consent !!</h4>
           <div class="ui right aligned container">
               <!--<div class="ui action input">
           <input type="url" placeholder="Search research studies or topics" size="30" id="queryConsent">
@@ -277,13 +282,16 @@
                   </div>
               </div>
           </div>
-
-
-          <h4 class="ui divider"></h4>
       </div>
+      <h4 class="ui divider"></h4>
     <!-- <div class="ui active centered inline loader"></div> -->
     <div class="ui active centered inline loader" style="display: block;" id="loader"></div>
-    <div class="ui container" id="Container"></div>
+    <div class="ui container" id="OpenContainer"></div>
+    <h4 class="ui divider"></h4>
+    <div class="ui container" id="ApprovedContainer"></div>
+    <h4 class="ui divider"></h4>
+    <div class="ui container" id="DeclinedContainer"></div>
+    <!-- <div class="ui container" id="Consented Container"></div> -->
   </div>
 
   <div class="ui inverted vertical footer segment">
@@ -300,9 +308,8 @@
         <div class="three wide column">
           <h4 class="ui inverted header">Resources</h4>
           <div class="ui inverted link list">
-            <a href="https://solidproject.org/use-solid/" class="item">What is SOLID</a>
-            <a href="https://forum.solidproject.org/top/all" class="item">SOLID Forum</a>
-            <a href="https://solidproject.org/use-solid/apps" class="item">Other SOLID App</a>
+            <a href="https://www.cmylife.nl/" class="item">CMLife Website</a>
+            <a href="https://www.cmylife.nl/projecten/cmyguideline" class="item">CMyGuideline</a>
           </div>
         </div>
         <div class="seven wide column">
@@ -310,7 +317,9 @@
           <p>This project is still working in progress so that some improvements and changes mighe be taken in place in the future.
             You are very welcome to comment or contribute to the project.
           </p>
+
         </div>
+        
       </div>
     </div>
   </div>

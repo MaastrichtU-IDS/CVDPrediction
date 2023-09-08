@@ -10,6 +10,7 @@ import { sign } from "tweetnacl";
 import { decodeUTF8, encodeBase64, decodeBase64 } from "tweetnacl-util";
 
 import fetch from "node-fetch";
+import { DeliveryEvent } from "rdf-namespaces/dist/schema";
 
 
 
@@ -35,7 +36,8 @@ var requestDataProcessGlobal = "http://www.w3.org/ns/dpv#hasProcessing";
 var requestAnalysisLogicGlobal = "http://www.w3.org/ns/dpv#hasAlgorithmicLogic";
 var requestConsequenceGlobal = "http://www.w3.org/ns/dpv#hasConsequences";
 var requestDataControllerGlobal = "http://www.w3.org/ns/dpv#hasDataController";
-var requestPersonalDataHandlingGlobal = "http://www.w3.org/ns/dpv#PersonalDataHandling"
+var requestPersonalDataHandlingGlobal = "http://www.w3.org/ns/dpv#PersonalDataHandling";
+var requestParticipation = "http://www.w3.org/ns/dpv#participation"
 
 var joinActionGlobal = "http://schema.org/JoinAction";
 var joinConsentGlobal = "http://www.w3.org/ns/dpv#Consent";
@@ -75,16 +77,15 @@ if (page === "cmlparticipate.html") {
                 const participant_basket = []
    
                 
-                fetchRequestURL(participant_dataFile).then(fetchedParticipantDataFileRef => {
-                    const participant_triple = fetchedParticipantDataFileRef.getTriples()
-                    participant_triple.forEach(eachDataItem => {
-                        participant_basket.push(eachDataItem.predicate.id);
-                    });
-            
-                    plotCardsOnPage(requestWebIdDocList, requestProfileIdList, requestURIList, "fromPageEntrance", "participant", session, participant_basket).then(outcome => {
-                        respondToRequest(outcome[0], outcome[1]);
-                    });
+                // fetchRequestURL(participant_dataFile).then(fetchedParticipantDataFileRef => {
+                //     const participant_triple = fetchedParticipantDataFileRef.getTriples()
+                //     participant_triple.forEach(eachDataItem => {
+                //         participant_basket.push(eachDataItem.predicate.id);
+                //     });
+                plotCardsOnPage(requestWebIdDocList, requestProfileIdList, requestURIList, "fromPageEntrance", "participant", session, participant_basket).then(outcome => {
+                    respondToRequest(outcome[0], outcome[1]);
                 });
+                // });
 
             });
         }).catch(error => console.log(error));;
@@ -134,7 +135,7 @@ async function sendFeedbackMsg(feedback_request_ID, feedback_researcher_webid, f
 
     // Create a new message ttl file in inbox
     const feedbackMsgLocation = feedback_researcher_webid.split("profile/card#")[0] + "inbox/" + feedback_request_ID.split("#")[1] + ".ttl";
-    console.log(feedbackMsgLocation)
+    // console.log(feedbackMsgLocation)
     //data[feedbackMsgLocation].put()
     //// Create the message content
     let random_sub = '';
@@ -195,12 +196,12 @@ getWebId().then(webId => {
     const homeMessageElement = document.getElementById("homeMessage");
     if (webId) {
         let currentPath = window.location.pathname.toString().split("dist/");
-        if (currentPath[1] === "cmllogin.html") { window.location.href = currentPath[0] + "dist/cmlconsent.html"; }
-        if (homeMessageElement) { homeMessageElement.textContent = "Welcome! " + webId; }
+        if (currentPath[1] === "cmlconsent.html") { window.location.href = currentPath[0] + "dist/cmlparticipate.html"; }
+        if (homeMessageElement) { homeMessageElement.textContent = "Welcome! " + "Jan Janssen"; }
 
         //if (currentPath[1] === "cmlconsent.html") {
-        document.getElementById("logStatusPage").textContent = "Log Out";
-        document.getElementById("logStatusFollowing").textContent = "Log Out";
+        // document.getElementById("logStatusPage").textContent = "Log Out";
+        // document.getElementById("logStatusFollowing").textContent = "Log Out";
         //}
 
         // ***** Log out ***** //
@@ -216,9 +217,9 @@ getWebId().then(webId => {
         });
     }
     else {
-        if (homeMessageElement) { homeMessageElement.textContent = "Contribute your data in SOLID to research with full control and privacy preserved." }
-        document.getElementById("logStatusPage").textContent = "Log In";
-        document.getElementById("logStatusFollowing").textContent = "Log In";
+        if (homeMessageElement) { homeMessageElement.textContent = "Directing to log-in page..." }
+        // document.getElementById("logStatusPage").textContent = "Log In";
+        // document.getElementById("logStatusFollowing").textContent = "Log In";
     }
 });
 // ****** Log In and Log Out (END) *********//
@@ -832,23 +833,6 @@ async function addParticipation(fetchProfile, requestList, participateRequestId,
                             registerIndexEntryInput.addRef(joinhasExpiryGlobal, expiry_single);
                             registerIndexEntryInput.addDateTime(joinhasExpiryTimeGlobal, endDate);
 
-
-                            // solid.data package is not working //
-                            //const addSubjectID = newParticipateDataElement.asRef().split('#')[1];
-                       
-                            //await solid.data[registerRequestResponseFileURL + '#' + addSubjectID][rdf.type].add(namedNode(joinActionGlobal));
-                            //await solid.data[registerRequestResponseFileURL + '#' + addSubjectID][rdf.type].add(namedNode(joinConsentGlobal));
-                            //await solid.data[registerRequestResponseFileURL + '#' + addSubjectID][joinDataSubjectGlobal].add(namedNode(fetchProfile));
-                            //await solid.data[registerRequestResponseFileURL + '#' + addSubjectID][joinConsentNoticeGlobal].add(namedNode(participateRequestId));
-                            //const currentDateTime = new Date(Date.now())
-                            //await solid.data[registerRequestResponseFileURL + '#' + addSubjectID][joinDataCreatedGlobal].add(literal(currentDateTime.toISOString(), "http://www.w3.org/2001/XMLSchema#dateTime"));
-                            //await solid.data[registerRequestResponseFileURL + '#' + addSubjectID][joinhasProvisionTimeGlobal].add(literal(currentDateTime.toISOString(), "http://www.w3.org/2001/XMLSchema#dateTime"));
-                            ////await data[registerRequestResponseFileURL + '#' + addSubjectID][joinhasProvisionMethodGlobal].add(namedNode("https://sunchang0124.github.io/dist/participate.html"));
-                            //await solid.data[registerRequestResponseFileURL + '#' + addSubjectID][joinhasWithdrawalTimeGlobal].add(literal(participate_period.toISOString(), "http://www.w3.org/2001/XMLSchema#dateTime"));
-                            //await solid.data[registerRequestResponseFileURL + '#' + addSubjectID][joinDataRecipientGlobal].add(namedNode(data_recipient));
-                            //await solid.data[registerRequestResponseFileURL + '#' + addSubjectID][joinhasExpiryGlobal].add(namedNode(expiry_single));
-                            //await solid.data[registerRequestResponseFileURL + '#' + addSubjectID][joinhasExpiryTimeGlobal].add(namedNode("http://www.w3.org/2001/XMLSchema#dateTime"));
-
                             const signature = sign.detached(decodeUTF8(participateRequestId.split('#')[1]), privateKey);
 
                             //const addedData = await solid.data[registerRequestResponseFileURL + '#' + addSubjectID][schema.validIn].add(literal(encodeBase64(signature)));
@@ -889,15 +873,55 @@ async function getRecommender(input) {
     return item;
 }
 
-async function getDataLabels(input) {
-    try {
-        let response = await fetch("https://data.bioontology.org/search?q=" + input + "&apikey=21646475-b5a0-4e92-8aba-d9fcfcfea388");
-        let data = await response.json();
-        let item = data['collection'][0]['prefLabel']
-        return item;
-    } catch (error) {
-        console.log(error)
+
+function getDataLabels(input) {
+    let code_dict = {
+        14089001: " - Red blood cell count",
+        184099003: " - Date of birth",
+        224209007: " - Residence and accommodation circumstances",
+        266995000: " - History of cardiovascular disease",
+        271649006: " - Systolic blood pressure",
+        414798009: " - N-terminal pro-B-type natriuretic peptide",
+        439401001: " - Diagnosis",
+        67079006: " - Glucose",
+        75672003: " - Platelet mean volume determination",
+
+        398192003: " - Co-morbid conditions",
+        182833002: " - Medication given",
+        401207004: " - Medication side effects present",
+        92818009: " - Chronic myeloid leukemia",
+
+        22232009: " - Hospital",
+        263495000: " - Gender",
+
+        D007182: " - Income",
+        D007341: " - Insurance",
+        118598001: " - Property",
+        224164009: " - Financial circumstances",
+
+        252150008: " - Lipid elements",
+        38082009: " - Hemoglobin",
+        56564003: " - Protein BCR-ABL",
+        6684200: " - Red cell distribution width",
+
+
+        14679004: " - Occupation",
+        397669002: " - Age",
+        409073007: " - Education",
+        703503000: " - Name"
+
     }
+    let item = code_dict[input]
+    return item
+
+    // try {
+    //     let response = await fetch("https://data.bioontology.org/search?q=" + input + "&apikey=21646475-b5a0-4e92-8aba-d9fcfcfea388");
+    //     let data = await response.json();
+    //     let item = data['collection'][0]['prefLabel']
+    //     return item;
+    // } catch (error) {
+    //     console.log(error)
+    // }
 }
 
 
@@ -940,11 +964,11 @@ function writeAllRequest(profile, requestTriples, fetchRequest) {
                 // if (requestTriples[i].predicate.id === requestOntologyGlobal){
                 //   ontologyList.push(requestTriples[i].object.value);}
                 if (requestTriples[i].predicate.id === requestExpiryGlobal) {
-                    requestContent.period = "End date: " + requestTriples[i].object.value;
+                    requestContent.period = requestTriples[i].object.value;
                 }
                 // requestContent.period = "End date: " + "2025-01-01"}
                 if (requestTriples[i].predicate.id === requestAnalysisLogicGlobal) {
-                    requestContent.analysis = "Analysis: " + requestTriples[i].object.value;
+                    requestContent.analysis = requestTriples[i].object.value;
                 }
                 if (requestTriples[i].predicate.id === requestCollectionSizeGlobal) {
                     requestContent.numInstance = requestTriples[i].object.value;
@@ -952,13 +976,16 @@ function writeAllRequest(profile, requestTriples, fetchRequest) {
                 // if (requestTriples[i].predicate.id === requestRecipientGlobal){
                 //   requestContent.recipient = "Data Recipient: " + requestTriples[i].object.value;}
                 if (requestTriples[i].predicate.id === requestConsequenceGlobal) {
-                    requestContent.consequence = "Consequence of data process: " + requestTriples[i].object.value;
+                    requestContent.consequence = requestTriples[i].object.value;
                 }
                 if (requestTriples[i].predicate.id === requestDataElementGlobal) {
                     dataElementList.push(requestTriples[i].object.value);
+                } //add jan janssen participation 
+                if (requestTriples[i].predicate.id === requestParticipation) {
+                    requestContent.participation = requestTriples[i].object.value;
                 }
             }
-            requestContent.purposeClass = "Class of purpose: " + purposeClassList;
+            requestContent.purposeClass = "Purpose: " + purposeClassList;
             requestContent.personalDataCategory = "Personal data categories: " + personalDataCategoryList;
             requestContent.dataProcessingCategory = "Data processing categories: " + dataProcessingCategoryList;
             // requestContent.ontology = ontologyList;
@@ -976,37 +1003,71 @@ function writeAllRequest(profile, requestTriples, fetchRequest) {
  **************************/
 async function generateCards(requestContentList, userRole, session, participant_basket) {
 
-    var cleanContainer = document.getElementById("Container");
-    cleanContainer.innerHTML = "";
+    var cleanContainer = document.getElementById("OpenContainer");
+    cleanContainer.innerHTML = "<h2>Open requests<\h2>";
 
-    const div_cardsContainer = document.createElement("div");
-    div_cardsContainer.className = "ui fluid fixed cards";
-    div_cardsContainer.id = "cardsContainer";
-    document.getElementById('Container').appendChild(div_cardsContainer);
+    var ApprovedContainer = document.getElementById("ApprovedContainer");
+    ApprovedContainer.innerHTML = "<h2>Approved requests<\h2>";
+
+    var declinedContainer = document.getElementById("DeclinedContainer");
+    declinedContainer.innerHTML = "<h2>Declined requests<\h2>";
+
+    const div_open_cardsContainer = document.createElement("div");
+    div_open_cardsContainer.className = "ui fluid fixed cards";
+    div_open_cardsContainer.id = "open_cardsContainer";
+    document.getElementById('OpenContainer').appendChild(div_open_cardsContainer);
+
+    const div_approved_cardsContainer = document.createElement("div");
+    div_approved_cardsContainer.className = "ui fluid fixed cards";
+    div_approved_cardsContainer.id = "approved_cardsContainer";
+    document.getElementById('ApprovedContainer').appendChild(div_approved_cardsContainer);
+
+    const div_declined_cardsContainer = document.createElement("div");
+    div_declined_cardsContainer.className = "ui fluid fixed cards";
+    div_declined_cardsContainer.id = "declined_cardsContainer";
+    document.getElementById('DeclinedContainer').appendChild(div_declined_cardsContainer);
+    
 
     let purpose_label = {
-        CommercialInterest: "red",
+        CommercialResearch: "orange",
         ResearchAndDevelopment: "blue",
-        Security: "teal",
-        ServiceOptimization: "orange",
-        ServicePersonalization: "green",
-        ServiceProvision: "yellow",
+        Security: "green",
+        RegistrationAuthentication: "yellow",
+        CreatePersonalizedRecommendations: "teal",
+        ServiceProvision: "red",
         LegalObligation: "purple"
     }
 
+    let open_count = false;
+    let approved_count = false;
+    let declined_count = false;
+
     for (var i = 0; i < requestContentList.length; i++) {
+
 
         // Generate request cards
         const div_card = document.createElement("div");
-        div_card.className = "card";
+        div_card.className = "ui fluid raised card";
         div_card.id = "cardID" + i.toString();
-        document.getElementById('cardsContainer').appendChild(div_card);
+        if (requestContentList[i].participation == "http://www.w3.org/ns/dpv#open"){
+            document.getElementById('open_cardsContainer').appendChild(div_card);
+            open_count = true;
+
+        }else if(requestContentList[i].participation == "http://www.w3.org/ns/dpv#consented"){
+            document.getElementById('approved_cardsContainer').appendChild(div_card);
+            approved_count = true;
+
+        }else if(requestContentList[i].participation == "http://www.w3.org/ns/dpv#declined"){
+            document.getElementById('declined_cardsContainer').appendChild(div_card);
+            declined_count = true;
+        }
+
 
         const div_label = document.createElement("a");
         let purpose_label_content = requestContentList[i].purposeClass.split(",")[0].toString().split(": ")[1].split("#")[1];
         div_label.className = "ui " + purpose_label[purpose_label_content] + " ribbon label";
         div_label.id = "labelID" + i.toString();
-        div_label.textContent = purpose_label_content;
+        div_label.textContent = purpose_label_content.toString().replace(/([A-Z][a-z])/g, ' $1').trim();
         document.getElementById('cardID' + i.toString()).appendChild(div_label);
 
         const div_content = document.createElement("div");
@@ -1021,197 +1082,219 @@ async function generateCards(requestContentList, userRole, session, participant_
         div_img.id = "imgID" + i.toString();
         document.getElementById('contentID' + i.toString()).appendChild(div_img);
 
-        const div_header = document.createElement("a");
+        const div_header = document.createElement("div");
         div_header.className = "header";
         div_header.id = "headerID" + i.toString();
         div_header.textContent = requestContentList[i].title //"Title of research"
-        div_header.href = requestContentList[i].url
+        // div_header.href = requestContentList[i].url
         document.getElementById('contentID' + i.toString()).appendChild(div_header);
 
         const div_meta = document.createElement("div");
         div_meta.className = "description";
         div_meta.id = "metaID" + i.toString();
         div_meta.textContent = "Requested by " + requestContentList[i].name + " from " + requestContentList[i].organization; //"IDS";
-        div_meta.href = requestContentList[i].url.toString().split("/public/")[0] + "/profile/card#me"
+        // div_meta.href = requestContentList[i].url.toString().split("/public/")[0] + "/profile/card#me"
         document.getElementById('contentID' + i.toString()).appendChild(div_meta);
-
-        const div_classPurpose = document.createElement("div");
-        div_classPurpose.className = "description";
-        div_classPurpose.id = "classPurposeID" + i.toString();
-        div_classPurpose.textContent = "Class of purpose: "; //equestContentList[i].purposeClass; //"Purpose Class";
-        document.getElementById('contentID' + i.toString()).appendChild(div_classPurpose);
-
-
-        const listofpurpose = requestContentList[i].purposeClass.split(",");
-        let href_classpurpose = document.createElement("a");
-        let link_classpurpose = document.createTextNode(listofpurpose[0].toString().split(": ")[1].split("#")[1]);
-        href_classpurpose.appendChild(link_classpurpose);
-        href_classpurpose.href = listofpurpose[0].toString().split(": ")[1];
-        document.getElementById('classPurposeID' + i.toString()).appendChild(href_classpurpose);
-
-
-        for (let itr = 1; itr < 3; itr++) {
-            if (itr < listofpurpose.length) {
-                document.getElementById('classPurposeID' + i.toString()).appendChild(document.createElement("div"));
-                let href_classpurpose_1 = document.createElement("a");
-
-                let link_classpurpose = document.createTextNode(listofpurpose[itr].toString().split("#")[1]);
-                href_classpurpose_1.appendChild(link_classpurpose);
-                href_classpurpose_1.href = listofpurpose[itr];
-                document.getElementById('classPurposeID' + i.toString()).appendChild(href_classpurpose_1);
-            }
-            if (listofpurpose.length > 3 && itr == 2) {
-                const div_endPurpose = document.createElement("div");
-                div_endPurpose.textContent = "... ... " + (listofpurpose.length - 3).toString() + " more classes of purpose";
-                document.getElementById('classPurposeID' + i.toString()).appendChild(div_endPurpose);
-            }
-
-        }
-
-
-
-
 
         const div_description = document.createElement("div");
         div_description.className = "description";
         div_description.id = "descriptionID" + i.toString();
-        div_description.textContent = "Study / data request description: " + requestContentList[i].purpose; //"Purpose description";
+        div_description.textContent = "Study description: " + requestContentList[i].purpose; //"Purpose description";
         document.getElementById('contentID' + i.toString()).appendChild(div_description);
 
-        const div_personalDataCategory = document.createElement("div");
-        div_personalDataCategory.className = "description";
-        div_personalDataCategory.id = "div_personalDataCategoryID" + i.toString();
-        div_personalDataCategory.textContent = "Personal Data Category: "; //requestContentList[i].personalDataCategory; //"Personal Data Category";
-        document.getElementById('contentID' + i.toString()).appendChild(div_personalDataCategory);
+
+        const div_extraContent = document.createElement("div");
+        div_extraContent.className = "extra content";
+        div_extraContent.id = "extraContent" + i.toString();
+        document.getElementById("cardID" + i.toString()).appendChild(div_extraContent);
+        
+        const div_readMoreButton = document.createElement("div");
+        div_readMoreButton.className = "ui buttom attached readMore button index_" + i.toString();
+        div_readMoreButton.textContent = "Read more";
+        div_readMoreButton.id = "readMoreButton" + i.toString();
+        document.getElementById('extraContent' + i.toString()).appendChild(div_readMoreButton);
+
+
+        const div_request_modal = document.createElement("div");
+        div_request_modal.className = "ui modal request index_" + i.toString();
+        div_request_modal.id = "request_modalID" + i.toString();
+        document.getElementById("modal_component").appendChild(div_request_modal);
+
+        const div_windowHeader = document.createElement("div");
+        div_windowHeader.className = "header";
+        div_windowHeader.textContent = requestContentList[i].title;
+        document.getElementById("request_modalID" + i.toString()).appendChild(div_windowHeader);
+
+        const div_windowContent = document.createElement("div");
+        div_windowContent.className = "request content";
+        div_windowContent.id = "request_contentID" + i.toString();
+        document.getElementById("request_modalID" + i.toString()).appendChild(div_windowContent);
+
+        const div_extraWindowContent = document.createElement("div");
+        div_extraWindowContent.className = "extra window content";
+        div_extraWindowContent.id = "extra_windowContent" + i.toString();
+        document.getElementById("request_contentID" + i.toString()).appendChild(div_extraWindowContent);
+
+
+        let addHeader_purpose = document.createElement("h5");
+        addHeader_purpose.className = "header"
+        addHeader_purpose.textContent =  "Purpose of data request:";
+        document.getElementById("extra_windowContent" + i.toString()).appendChild(addHeader_purpose);
+
+        const div_classPurpose = document.createElement("div");
+        div_classPurpose.className = "description";
+        div_classPurpose.id = "classPurposeID" + i.toString();
+        const listofpurpose = requestContentList[i].purposeClass.split(",")
+        div_classPurpose.textContent = listofpurpose[0].toString().split(": ")[1].split("#")[1].replace(/([A-Z][a-z])/g, ' $1').trim(); //equestContentList[i].purposeClass; //"Purpose Class";
+        document.getElementById('extra_windowContent' + i.toString()).appendChild(div_classPurpose);
+
+      
+
+        let addHeader_description = document.createElement("h5");
+        addHeader_description.className = "header"
+        addHeader_description.textContent =  "Study description:";
+        document.getElementById("extra_windowContent" + i.toString()).appendChild(addHeader_description);
+
+        const div_windowDescription = document.createElement("div");
+        div_windowDescription.className = "description";
+        div_windowDescription.id = "descriptionID" + i.toString();
+        div_windowDescription.textContent = requestContentList[i].purpose; //"Purpose description";
+        document.getElementById('extra_windowContent' + i.toString()).appendChild(div_windowDescription);
+
+
+        let addHeader_category = document.createElement("h5");
+        addHeader_category.className = "header"
+        addHeader_category.textContent =  "Personal Data Category: "; 
+        document.getElementById("extra_windowContent" + i.toString()).appendChild(addHeader_category);
+
+        // const div_personalDataCategory = document.createElement("div");
+        // div_personalDataCategory.className = "description";
+        // div_personalDataCategory.id = "div_personalDataCategoryID" + i.toString();
+        // div_personalDataCategory.textContent = //requestContentList[i].personalDataCategory; //"Personal Data Category";
+        // document.getElementById('extra_windowContent' + i.toString()).appendChild(div_personalDataCategory);
+
 
 
         const listofpersonalDataCategory = requestContentList[i].personalDataCategory.split(",");
-        let href_personalDataCategory = document.createElement("a");
-        let link_personalDataCategory = document.createTextNode(listofpersonalDataCategory[0].toString().split(": ")[1].split("#")[1]);
+        let href_personalDataCategory = document.createElement("div");
+        let link_personalDataCategory = document.createTextNode(" - "+listofpersonalDataCategory[0].toString().split(": ")[1].split("#")[1].replace(/([A-Z][a-z])/g, ' $1').trim());
         href_personalDataCategory.appendChild(link_personalDataCategory);
-        href_personalDataCategory.href = listofpersonalDataCategory[0].toString().split(": ")[1];
-        document.getElementById('div_personalDataCategoryID' + i.toString()).appendChild(href_personalDataCategory);
+        document.getElementById('extra_windowContent' + i.toString()).appendChild(href_personalDataCategory);
 
 
         for (let itr = 1; itr < 3; itr++) {
             if (itr < listofpersonalDataCategory.length) {
-                document.getElementById('div_personalDataCategoryID' + i.toString()).appendChild(document.createElement("div"));
-                let href_personalDataCategory_1 = document.createElement("a");
-                let link_personalDataCategory = document.createTextNode(listofpersonalDataCategory[itr].toString().split("#")[1]);
+                document.getElementById('extra_windowContent' + i.toString()).appendChild(document.createElement("div"));
+                let href_personalDataCategory_1 = document.createElement("div");
+                let link_personalDataCategory = document.createTextNode(" - "+listofpersonalDataCategory[itr].toString().split("#")[1].replace(/([A-Z][a-z])/g, ' $1').trim());
                 href_personalDataCategory_1.appendChild(link_personalDataCategory);
-                href_personalDataCategory_1.href = listofpersonalDataCategory[itr];
-                document.getElementById('div_personalDataCategoryID' + i.toString()).appendChild(href_personalDataCategory_1);
+                // href_personalDataCategory_1.textContent = listofpersonalDataCategory[itr].replace(/([A-Z][a-z])/g, ' $1').trim();
+                document.getElementById('extra_windowContent' + i.toString()).appendChild(href_personalDataCategory_1);
             }
             if (listofpersonalDataCategory.length > 3 && itr == 2) {
                 const div_endDataCategory = document.createElement("div");
                 div_endDataCategory.textContent = "... ... " + (listofpersonalDataCategory.length - 3).toString() + " more personal data categories";
-                document.getElementById('div_personalDataCategoryID' + i.toString()).appendChild(div_endDataCategory);
+                document.getElementById('extra_windowContent' + i.toString()).appendChild(div_endDataCategory);
             }
         }
 
+        let addHeader_dataProcessingCategory = document.createElement("h5");
+        addHeader_dataProcessingCategory.className = "header"
+        addHeader_dataProcessingCategory.textContent =  "Data Processing Category: ";
+        document.getElementById("extra_windowContent" + i.toString()).appendChild(addHeader_dataProcessingCategory);
 
-        const div_dataProcessingCategory = document.createElement("div");
-        div_dataProcessingCategory.className = "description";
-        div_dataProcessingCategory.id = "div_dataProcessingCategoryID" + i.toString();
-        div_dataProcessingCategory.textContent = "Data Processing Category: "; //requestContentList[i].dataProcessingCategory; //"Data Processing Category";
-        document.getElementById('contentID' + i.toString()).appendChild(div_dataProcessingCategory);
+        // const div_dataProcessingCategory = document.createElement("div");
+        // div_dataProcessingCategory.className = "description";
+        // div_dataProcessingCategory.id = "div_dataProcessingCategoryID" + i.toString();
+        // div_dataProcessingCategory.textContent = "Data Processing Category: "; //requestContentList[i].dataProcessingCategory; //"Data Processing Category";
+        // document.getElementById('extra_windowContent' + i.toString()).appendChild(div_dataProcessingCategory);
 
 
         const listofdataProcessingCategory = requestContentList[i].dataProcessingCategory.split(",");
-        let href_dataProcessingCategory = document.createElement("a");
-        let link_dataProcessingCategory = document.createTextNode(listofdataProcessingCategory[0].toString().split(": ")[1].split("#")[1]);
+        let href_dataProcessingCategory = document.createElement("div");
+        let link_dataProcessingCategory = document.createTextNode(" - "+listofdataProcessingCategory[0].toString().split(": ")[1].split("#")[1].replace(/([A-Z][a-z])/g, ' $1').trim());
         href_dataProcessingCategory.appendChild(link_dataProcessingCategory);
-        href_dataProcessingCategory.href = listofdataProcessingCategory[0].toString().split(": ")[1];
-        document.getElementById('div_dataProcessingCategoryID' + i.toString()).appendChild(href_dataProcessingCategory);
+        // href_dataProcessingCategory.textContent = listofdataProcessingCategory[0].toString().split(": ")[1].replace(/([A-Z][a-z])/g, ' $1').trim();
+        document.getElementById('extra_windowContent' + i.toString()).appendChild(href_dataProcessingCategory);
 
 
         for (let itr = 1; itr < 3; itr++) {
             if (itr < listofdataProcessingCategory.length) {
-                document.getElementById('div_dataProcessingCategoryID' + i.toString()).appendChild(document.createElement("div"));
-                let href_dataProcessingCategory_1 = document.createElement("a");
-                let link_dataProcessingCategory = document.createTextNode(listofdataProcessingCategory[itr].toString().split("#")[1]);
+                document.getElementById('extra_windowContent' + i.toString()).appendChild(document.createElement("div"));
+                let href_dataProcessingCategory_1 = document.createElement("div");
+                let link_dataProcessingCategory = document.createTextNode(" - "+listofdataProcessingCategory[itr].toString().split("#")[1].replace(/([A-Z][a-z])/g, ' $1').trim());
                 href_dataProcessingCategory_1.appendChild(link_dataProcessingCategory);
-                href_dataProcessingCategory_1.href = listofdataProcessingCategory[itr];
-                document.getElementById('div_dataProcessingCategoryID' + i.toString()).appendChild(href_dataProcessingCategory_1);
+                // href_dataProcessingCategory_1.textContent = listofdataProcessingCategory[itr].replace(/([A-Z][a-z])/g, ' $1').trim();
+                document.getElementById('extra_windowContent' + i.toString()).appendChild(href_dataProcessingCategory_1);
             }
             if (listofdataProcessingCategory.length > 3 && itr == 2) {
                 const div_endDataProcessing = document.createElement("div");
                 div_endDataProcessing.textContent = "... ... " + (listofdataProcessingCategory.length - 3).toString() + " more elements"; //"period";
-                document.getElementById('div_dataProcessingCategoryID' + i.toString()).appendChild(div_endDataProcessing);
+                document.getElementById('extra_windowContent' + i.toString()).appendChild(div_endDataProcessing);
             }
         }
 
 
         // Request data elements
+        let addHeader_dataelement= document.createElement("h5");
+        addHeader_dataelement.className = "header"
+        addHeader_dataelement.textContent =  "Requested data: "; 
+        document.getElementById("extra_windowContent" + i.toString()).appendChild(addHeader_dataelement);
 
-        const div_dataElement = document.createElement("div");
-        div_dataElement.className = "description";
-        div_dataElement.id = "dataElementID" + i.toString();
-        div_dataElement.textContent = "Requested data: " //requestContentList[i].dataElement; //"Data Element";
-        document.getElementById('contentID' + i.toString()).appendChild(div_dataElement);
+        // const div_dataElement = document.createElement("div");
+        // div_dataElement.className = "description";
+        // div_dataElement.id = "dataElementID" + i.toString();
+        // div_dataElement.textContent = "Requested data: " //requestContentList[i].dataElement; //"Data Element";
+        // document.getElementById('extra_windowContent' + i.toString()).appendChild(div_dataElement);
 
         const listofElement = requestContentList[i].dataElement.split(",");
-        //let href_dataElement_0 = document.createElement("a");
-        //let displayLabel = await getDataLabels(listofElement[0].toString().split(": ")[1].split("/").pop())
-        //// let linkText = document.createTextNode(listofElement[0].toString().split(": ")[1].split("//")[1]);
-        //let linkText = document.createTextNode(displayLabel)
-        //href_dataElement_0.appendChild(linkText);
-        //href_dataElement_0.href = listofElement[0].toString().split(": ")[1];
-        //document.getElementById('contentID' + i.toString()).appendChild(href_dataElement_0);
 
         console.log(listofElement.length)
-        if (listofElement.length <= 5) {
 
-            for (let itr = 1; itr < 5; itr++) {
-                const div_dataElement = document.getElementById('contentID' + i.toString()).appendChild(document.createElement("div"));
-                let href_dataElement = document.createElement("a");
+        if (listofElement.length <= 30) {
 
-                let displayLabel = await getDataLabels(listofElement[itr].toString().split("/").pop())
-                // let linkText = document.createTextNode(listofElement[itr].toString().split("//")[1]);
-                let linkText = document.createTextNode(displayLabel)
-                href_dataElement.appendChild(linkText);
-                href_dataElement.href = listofElement[itr];
-                document.getElementById('contentID' + i.toString()).appendChild(href_dataElement);
+            for (let itr = 1; itr < listofElement.length; itr++) {
+                const div_dataElement = document.getElementById('extra_windowContent' + i.toString()).appendChild(document.createElement("div"));
+                let href_dataElement = document.createElement("div");
+                // let displayLabel = await getDataLabels(listofElement[itr].toString().split("/").pop())
+                href_dataElement.textContent = getDataLabels(listofElement[itr].toString().split("/").pop())
+                document.getElementById('extra_windowContent' + i.toString()).appendChild(href_dataElement);
             }
 
         }
-        else if (listofElement.length > 5) {
+        else if (listofElement.length > 30) {
             
-            for (let itr = 1; itr < 5; itr++) {
-                const div_dataElement = document.getElementById('contentID' + i.toString()).appendChild(document.createElement("div"));
-                let href_dataElement = document.createElement("a");
+            for (let itr = 1; itr < listofElement.length; itr++) {
+                const div_dataElement = document.getElementById('extra_windowContent' + i.toString()).appendChild(document.createElement("div"));
+                let href_dataElement = document.createElement("div");
 
-                let displayLabel = await getDataLabels(listofElement[itr].toString().split("/").pop())
-                // let linkText = document.createTextNode(listofElement[itr].toString().split("//")[1]);
-                let linkText = document.createTextNode(displayLabel)
-                href_dataElement.appendChild(linkText);
-                href_dataElement.href = listofElement[itr];
-                document.getElementById('contentID' + i.toString()).appendChild(href_dataElement);
+                // let displayLabel = await getDataLabels(listofElement[itr].toString().split("/").pop())
+                href_dataElement.textContent = getDataLabels(listofElement[itr].toString().split("/").pop())
+
+                document.getElementById('extra_windowContent' + i.toString()).appendChild(href_dataElement);
             }
 
             const div_endElement = document.createElement("div");//document.getElementById('contentID' + i.toString()).appendChild(document.createElement("div"));
             div_endElement.id = "dropdown_option" + i.toString();
             div_endElement.className = "ui floating dropdown error";
             div_endElement.textContent = "... ... " + (listofElement.length - 5).toString() + " more data elements"; //"period";
-            document.getElementById('contentID' + i.toString()).appendChild(div_endElement);
+            document.getElementById('extra_windowContent' + i.toString()).appendChild(div_endElement);
 
             const dropdown_icon = document.createElement("i");
             dropdown_icon.className = "dropdown icon";
-            document.getElementById('dropdown_option' + i.toString()).appendChild(dropdown_icon);
+            document.getElementById('extra_windowContent' + i.toString()).appendChild(dropdown_icon);
 
-            const dropdown_menu = document.getElementById('dropdown_option' + i.toString()).appendChild(document.createElement("div"));
+            const dropdown_menu = document.getElementById('extra_windowContent' + i.toString()).appendChild(document.createElement("div"));
             dropdown_menu.className = "menu";
             dropdown_menu.id = "menu" + + i.toString();
-            document.getElementById('dropdown_option' + i.toString()).appendChild(dropdown_menu);
+            document.getElementById('extra_windowContent' + i.toString()).appendChild(dropdown_menu);
 
-            for (let itr = 5; itr < listofElement.length; itr++) {
-                let dropdown_option = document.getElementById('menu' + i.toString()).appendChild(document.createElement("a"));
+            for (let itr = 30; itr < listofElement.length; itr++) {
+                let dropdown_option = document.getElementById('menu' + i.toString()).appendChild(document.createElement("div"));
                 dropdown_option.className = "item";
-                let displayLabel = await getDataLabels(listofElement[itr].toString().split("/").pop())
-                // let linkText = document.createTextNode(listofElement[itr].toString().split("//")[1]);
-                let linkText = document.createTextNode(displayLabel)
-                dropdown_option.appendChild(linkText);
-                dropdown_option.href = listofElement[itr];
+
+                let displayLabel = getDataLabels(listofElement[itr].toString().split("/").pop())
+
                 document.getElementById('menu' + i.toString()).appendChild(dropdown_option);
 
             }
@@ -1225,288 +1308,184 @@ async function generateCards(requestContentList, userRole, session, participant_
         $('.ui.dropdown')
             .dropdown()
             ;
-
-
-
+        
+        let addHeader_period= document.createElement("h5");
+        addHeader_period.className = "header"
+        addHeader_period.textContent =  "Your data will be collected and used until: "; 
+        document.getElementById("extra_windowContent" + i.toString()).appendChild(addHeader_period);
 
         const div_period = document.createElement("div");
         div_period.className = "description";
         div_period.id = "periodID" + i.toString();
-        div_period.textContent = requestContentList[i].period; //"period";
-        document.getElementById('contentID' + i.toString()).appendChild(div_period);
+        div_period.textContent = requestContentList[i].period.toString().split("T")[0]; //"period";
+        document.getElementById('extra_windowContent' + i.toString()).appendChild(div_period);
+        
+        
+        let addHeader_instance= document.createElement("h5");
+        addHeader_instance.className = "header"
+        addHeader_instance.textContent =  "Expected number of participants: "; 
+        document.getElementById("extra_windowContent" + i.toString()).appendChild(addHeader_instance);
 
         const div_numInstance = document.createElement("div");
         div_numInstance.className = "description";
         div_numInstance.id = "instanceID" + i.toString();
-        div_numInstance.textContent = "Instances: " + requestContentList[i].numInstance; //"numInstance";
-        document.getElementById('contentID' + i.toString()).appendChild(div_numInstance);
+        div_numInstance.textContent = requestContentList[i].numInstance; //"numInstance";
+        document.getElementById('extra_windowContent' + i.toString()).appendChild(div_numInstance);
+
+
+        let addHeader_analysis= document.createElement("h5");
+        addHeader_analysis.className = "header"
+        addHeader_analysis.textContent =  "Planned analysis: "; 
+        document.getElementById("extra_windowContent" + i.toString()).appendChild(addHeader_analysis);
 
         const div_analysis = document.createElement("div");
         div_analysis.className = "description";
         div_analysis.id = "analysisID" + i.toString();
         div_analysis.textContent = requestContentList[i].analysis; //"analysis";
-        document.getElementById('contentID' + i.toString()).appendChild(div_analysis);
+        document.getElementById('extra_windowContent' + i.toString()).appendChild(div_analysis);
+
+        
+        let addHeader_impact= document.createElement("h5");
+        addHeader_impact.className = "header"
+        addHeader_impact.textContent =  "Anticipated impact: "; 
+        document.getElementById("extra_windowContent" + i.toString()).appendChild(addHeader_impact);
 
         const div_consequence = document.createElement("div");
         div_consequence.className = "description";
         div_consequence.id = "consequenceID" + i.toString();
         div_consequence.textContent = requestContentList[i].consequence; //"consequence";
-        document.getElementById('contentID' + i.toString()).appendChild(div_consequence);
+        document.getElementById('extra_windowContent' + i.toString()).appendChild(div_consequence);
 
-        // const div_recipient = document.createElement("div");
-        // div_recipient.className = "description";
-        // div_recipient.id = "recipientID"+i.toString();
-        // div_recipient.textContent = requestContentList[i].recipient; //"recipient";
-        // document.getElementById('contentID'+i.toString()).appendChild(div_recipient);
-
+        
         const div_extra = document.createElement("div");
         div_extra.className = "extra content";
         div_extra.id = "extraID" + i.toString();
-        document.getElementById('cardID' + i.toString()).appendChild(div_extra);
+        document.getElementById('request_modalID' + i.toString()).appendChild(div_extra);
 
-        if (userRole === "participant") {
+        //
+        if(requestContentList[i].participation != "http://www.w3.org/ns/dpv#consented"){
+            const div_untilDate_des = document.createElement("h5");
+            div_untilDate_des.className = "ui green header";
+            div_untilDate_des.id = "untilDate_des" + i.toString();
+            div_untilDate_des.textContent = "I would like to give consent to this study to use my data until : "
+            document.getElementById('extraID' + i.toString()).appendChild(div_untilDate_des);
+    
+            const div_forDate = document.createElement("div");
+            div_forDate.className = "ui transparent input";
+            div_forDate.id = "forDate" + i.toString();
+            document.getElementById('untilDate_des' + i.toString()).appendChild(div_forDate);
 
-            if (session.webId.length > 5) {
+            const div_untilDate = document.createElement("input");
+            div_untilDate.type = "date";
+            div_untilDate.id = "untilDate" + i.toString();
+            document.getElementById("forDate" + i.toString()).appendChild(div_untilDate);
 
-                // Hard coding here for CML project
-                const haveData = true// participant_basket.some(r => listofElement.includes(r))
+            const div_checkbox_field = document.createElement("div");
+            div_checkbox_field.className = "inline field"
+            div_checkbox_field.id = "inline_field" + i.toString();
+            document.getElementById('extraID' + i.toString()).appendChild(div_checkbox_field);
 
-                
-                if (haveData) {
+            const checkbox_label = document.createElement("h5");
+            checkbox_label.className = "ui green header"
+            checkbox_label.textContent = "I would like to receive the final results of this study. (If yes, check the box) "
+            checkbox_label.id = "label" + i.toString();
+            document.getElementById("inline_field" + i.toString()).appendChild(checkbox_label);
 
-                    const div_untilDate_des = document.createElement("div");
-                    div_untilDate_des.className = "description";
-                    div_untilDate_des.id = "untilDate_des" + i.toString();
-                    div_untilDate_des.textContent = "Withdrawal Date: "
-                    document.getElementById('extraID' + i.toString()).appendChild(div_untilDate_des);
+            const div_field = document.createElement("div");
+            div_field.className = "field"
+            div_field.id = "field"+ i.toString();
+            document.getElementById('inline_field' + i.toString()).appendChild(div_field);
 
-                    const div_forDate = document.createElement("div");
-                    div_forDate.className = "ui transparent input";
-                    div_forDate.id = "forDate" + i.toString();
-                    document.getElementById('untilDate_des' + i.toString()).appendChild(div_forDate);
 
-                    const div_untilDate = document.createElement("input");
-                    div_untilDate.type = "date";
-                    div_untilDate.id = "untilDate" + i.toString();
-                    document.getElementById("forDate" + i.toString()).appendChild(div_untilDate);
+            const div_checkbox = document.createElement("div");
+            div_checkbox.className = "ui checkbox"
+            div_checkbox.id = "checkbox" + i.toString();
+            document.getElementById('label' + i.toString()).appendChild(div_checkbox);
 
-                    const div_data_recipient_des = document.createElement("div");
-                    div_data_recipient_des.className = "description";
-                    div_data_recipient_des.id = "data_recipient_des" + i.toString();
-                    div_data_recipient_des.textContent = "Data Recipient: "
-                    document.getElementById('extraID' + i.toString()).appendChild(div_data_recipient_des);
+            $('.ui.checkbox')
+            .checkbox()
+            ;
 
-                    const div_data_recipient = document.createElement("select");
-                    div_data_recipient.className = "ui dropdown";
-                    div_data_recipient.id = "data_recipient" + i.toString();
-                    document.getElementById("data_recipient_des" + i.toString()).appendChild(div_data_recipient);
-                    const div_option_1 = document.createElement("option");
-                    div_option_1.value = "https://chang.inrupt.net/profile/card#me";
-                    div_option_1.textContent = "Radboud UMC+";
-                    document.getElementById("data_recipient" + i.toString()).appendChild(div_option_1);
-                    const div_option_2 = document.createElement("option");
-                    div_option_2.value = "https://chang1025.solidcommunity.net/profile/card#me";
-                    div_option_2.textContent = "Maastricht UMC+";
-                    document.getElementById("data_recipient" + i.toString()).appendChild(div_option_2);
-                    const div_option_3 = document.createElement("option");
-                    div_option_3.value = "https://chang1025.solidcommunity.net/profile/card#me";
-                    div_option_3.textContent = "Maastricht University";
-                    document.getElementById("data_recipient" + i.toString()).appendChild(div_option_3);
-
-                    const div_buttons = document.createElement("div");
-                    div_buttons.className = "ui two buttons";
-                    div_buttons.id = "buttonsID" + i.toString();
-                    document.getElementById('extraID' + i.toString()).appendChild(div_buttons);
-
-                    const div_redButton = document.createElement("button");
-                    div_redButton.className = "ui red toggle Decline button answer index_" + i.toString();
-                    div_redButton.id = "redButtonID" + i.toString();
-                    div_redButton.textContent = "Decline";
-                    document.getElementById('buttonsID' + i.toString()).appendChild(div_redButton);
-
-                    const div_greenButton = document.createElement("button");
-                    div_greenButton.className = "ui green toggle Approve button answer index_" + i.toString();
-                    div_greenButton.id = "greenButtonID" + i.toString();
-                    div_greenButton.textContent = "Approve";
-                    document.getElementById('buttonsID' + i.toString()).appendChild(div_greenButton);
-                } else {
-
-                    const div_NoData = document.createElement("h4");
-                    // div_NoData.className = "content";
-                    div_NoData.id = "div_NoData_des" + i.toString();
-                    div_NoData.textContent = "Requested data is not detected in your pod!"
-                    document.getElementById('extraID' + i.toString()).appendChild(div_NoData);
-
-                    const div_NoData_buttons = document.createElement("div");
-                    div_NoData_buttons.className = "ui grey NoDataFeedback button index_" + i.toString();
-                    div_NoData_buttons.id = "noData_buttonsID" + i.toString();
-                    div_NoData_buttons.textContent = "Send a message to the researcher."
-                    document.getElementById('extraID' + i.toString()).appendChild(div_NoData_buttons);
-
-                    // document.getElementById("feedback_modal").id = "feedback_modalID"+i.toString(); 
-          
-                    const div_feedback_modal = document.createElement("div");
-                    div_feedback_modal.className = "ui modal index_" + i.toString();
-                    div_feedback_modal.id = "feedback_modalID" + i.toString();
-                    document.getElementById("modal_component").appendChild(div_feedback_modal);
-
-                    //console.log(document.getElementById("feedback_modalID" + i.toString()))
-
-                    const div_close_icon = document.createElement("i");
-                    div_close_icon.className = "close icon";
-                    document.getElementById("feedback_modalID" + i.toString()).appendChild(div_close_icon);
-
-                    const div_header = document.createElement("div");
-                    div_header.className = "header";
-                    div_header.textContent = "Send a message to the researcher";
-                    document.getElementById("feedback_modalID" + i.toString()).appendChild(div_header);
-
-                    const div_content = document.createElement("div");
-                    div_content.className = "feedback content";
-                    div_content.id = "feedback_contentID" + i.toString();
-                    document.getElementById("feedback_modalID" + i.toString()).appendChild(div_content);
-
-                    const div_form = document.createElement("div");
-                    div_form.className = "ui form";
-                    div_form.id = "formID" + i.toString();
-                    document.getElementById("feedback_contentID" + i.toString()).appendChild(div_form);
-
-                    // const div_extension = document.createElement("grammarly-extension");
-                    // div_extension.style = "position: absolute; top: 0px; left: 0px; pointer-events: none;";
-                    // div_extension.className ="cGcvT";
-                    // div_extension.id = "formID"+i.toString();
-                    // document.getElementById("formID"+i.toString()).appendChild(div_extension); 
-
-                    const div_header4 = document.createElement("h4");
-                    div_header4.className = "ui dividing header";
-                    div_header4.id = "header4ID" + i.toString();
-                    div_header4.textContent = "Topic of your message:";
-                    document.getElementById("formID" + i.toString()).appendChild(div_header4);
-
-                    const div_feedback_dropdown = document.createElement("select");
-                    div_feedback_dropdown.className = "ui fluid dropdown index_" + i.toString();
-                    div_feedback_dropdown.id = "dropdownID" + i.toString();
-                    document.getElementById("header4ID" + i.toString()).appendChild(div_feedback_dropdown);
-
-                    const div_feedback_option_1 = document.createElement("option");
-                    div_feedback_option_1.value = 0;
-                    div_feedback_option_1.textContent = "I think I have the data elements you are requesting but it is not detected. ";
-                    document.getElementById("dropdownID" + i.toString()).appendChild(div_feedback_option_1);
-
-                    const div_feedback_option_2 = document.createElement("option");
-                    div_feedback_option_2.value = 1;
-                    div_feedback_option_2.textContent = "I want to give feedback to your request.";
-                    document.getElementById("dropdownID" + i.toString()).appendChild(div_feedback_option_2);
-
-                    const div_feedback_message_field = document.createElement("div");
-                    div_feedback_message_field.className = "field";
-                    div_feedback_message_field.id = "feedback_fieldID" + i.toString();
-                    document.getElementById("formID" + i.toString()).appendChild(div_feedback_message_field);
-
-                    const div_label = document.createElement("label");
-                    div_label.textContent = "Message";
-                    document.getElementById("feedback_fieldID" + i.toString()).appendChild(div_label);
-
-                    const div_feedback_textarea = document.createElement("textarea");
-                    div_feedback_textarea.id = "feedback_from_participantID" + i.toString();
-                    document.getElementById("feedback_fieldID" + i.toString()).appendChild(div_feedback_textarea);
-
-                    const div_action = document.createElement("div");
-                    div_action.className = "actions";
-                    div_action.id = "feedback_button_fieldID" + i.toString();
-                    document.getElementById("feedback_modalID" + i.toString()).appendChild(div_action);
-
-                    const div_sendFeedback_button = document.createElement("div");
-                    div_sendFeedback_button.className = "ui green sendFeedback answer button listen index_" + i.toString();
-                    div_sendFeedback_button.id = "sendFeedback_buttonsID" + i.toString();
-                    div_sendFeedback_button.textContent = "Send";
-                    document.getElementById("feedback_button_fieldID" + i.toString()).appendChild(div_sendFeedback_button);
-
-                    $(document)
-                        .ready(function () {
-                            let modal_para = ".ui.modal.index_" + i.toString();
-                            let button_para = ".NoDataFeedback.button.index_" + i.toString();
-                            $(modal_para)
-                                .modal('attach events', button_para, 'show')
-                                ;
-                        });
-
-                }
-            } else {
-                const div_disabled_buttons = document.createElement("div");
-                div_disabled_buttons.className = "ui fluid disabled buttons";
-                div_disabled_buttons.id = "disabled_buttonsID" + i.toString();
-                div_greenButton.textContent = "Want to participate? Please login.";
-                document.getElementById('extraID' + i.toString()).appendChild(div_disabled_buttons);
-            }
-
-        } else {
-            var dataRequested_numInstance = Number(requestContentList[i].numInstance)
-            await getTriplesObjects(registerParticipationFolder + requestContentList[i].url.split('#')[1] + ".ttl", null, null, true).then(getTriples => {
-
-                const percent_num = (Math.floor(((getTriples.length / 6) / dataRequested_numInstance) * 100)) // Hard code here! 
-                let percent = 0
-                if (percent_num <= 100) {
-                    percent = percent_num
-                } else {
-                    percent = 100
-                }
-
-                // const percent = (Math.floor(Math.random() * 10) * 10).toString()
-                const div_progress = document.createElement("div");
-                div_progress.className = "ui indicating progress";
-                div_progress.dataset.percent = percent;
-                div_progress.id = "progressID" + i.toString();
-                document.getElementById('extraID' + i.toString()).appendChild(div_progress);
-
-                const div_progressBar = document.createElement("div");
-                div_progressBar.className = "bar";
-                div_progressBar.style.width = percent + '%';
-                div_progressBar.style.transitionDuration = '300ms'
-                div_progressBar.id = "progressBarID" + i.toString();
-                document.getElementById('progressID' + i.toString()).appendChild(div_progressBar);
-
-                const div_progressLabel = document.createElement("div");
-                div_progressLabel.className = "label";
-                div_progressLabel.id = "progressLabelID" + i.toString();
-                div_progressLabel.textContent = "Data collection progress - " + percent + "%";
-                document.getElementById('progressID' + i.toString()).appendChild(div_progressLabel);
-
-                const div_buttons = document.createElement("div");
-                div_buttons.className = "ui two buttons";
-                div_buttons.id = "buttonsID" + i.toString();
-                document.getElementById('extraID' + i.toString()).appendChild(div_buttons);
-
-                if (userRole === "requester") {
-
-                    const div_regularButton = document.createElement("button");
-                    div_regularButton.className = "ui grey stopCollection button answer index_" + i.toString(); //rglLearning
-                    div_regularButton.id = "stopCollectionButtonID" + i.toString(); //regularButtonID
-                    div_regularButton.textContent = "Stop collection"//"Regular analysis";
-                    document.getElementById('buttonsID' + i.toString()).appendChild(div_regularButton);
-
-                    const div_privacyButton = document.createElement("button");
-                    div_privacyButton.className = "ui blue triggerAnalysis button answer index_" + i.toString(); //ppLearning
-                    div_privacyButton.id = "triggerAnalysisButtonID" + i.toString(); //privacyButtonID
-                    div_privacyButton.textContent = "Trigger analysis" //"Secure analysis";
-                    document.getElementById('buttonsID' + i.toString()).appendChild(div_privacyButton);
-
-                } else if (userRole === "podProvider") {
-                    const div_privacyButton = document.createElement("button");
-                    div_privacyButton.className = "ui grey ppLearning button answer index_" + i.toString(); //ppLearning
-                    div_privacyButton.id = "privacyButtonID" + i.toString();
-                    div_privacyButton.textContent = "Abortion";
-                    document.getElementById('buttonsID' + i.toString()).appendChild(div_privacyButton);
-
-                    const div_regularButton = document.createElement("button");
-                    div_regularButton.className = "ui blue proceed button answer index_" + i.toString(); //rglLearning
-                    div_regularButton.id = "regularButtonID" + i.toString();
-                    div_regularButton.textContent = "Proceed"; //Regular analysis
-                    document.getElementById('buttonsID' + i.toString()).appendChild(div_regularButton);
-                }
-            })//.catch((err)=> {alert(err.message);});
+            const input_checkbox = document.createElement("input");
+            input_checkbox.type = "checkbox"
+            input_checkbox.id = "receiveResults" + i.toString();
+            document.getElementById("checkbox" + i.toString()).appendChild(input_checkbox);
         }
+
+        const div_actions = document.createElement("div");
+        div_actions.className = "actions";
+        div_actions.id = "actionsID" + i.toString();
+        document.getElementById('extraID' + i.toString()).appendChild(div_actions);
+
+
+
+        const div_buttons = document.createElement("div");
+        div_buttons.className = "ui two buttons";
+        div_buttons.id = "buttonsID" + i.toString();
+        document.getElementById('actionsID' + i.toString()).appendChild(div_buttons);
+
+
+        if (requestContentList[i].participation == "http://www.w3.org/ns/dpv#open"){
+            const div_greenButton = document.createElement("button");
+            div_greenButton.className = "ui green toggle approve button answer index_" + i.toString();
+            div_greenButton.id = "greenButtonID" + i.toString();
+            div_greenButton.textContent = "Approve";
+            document.getElementById('buttonsID' + i.toString()).appendChild(div_greenButton);
+
+            const div_redButton = document.createElement("button");
+            div_redButton.className = "ui red toggle deny button answer index_" + i.toString();
+            div_redButton.id = "redButtonID" + i.toString();
+            div_redButton.textContent = "Decline";
+            document.getElementById('buttonsID' + i.toString()).appendChild(div_redButton);
+
+        }else if(requestContentList[i].participation == "http://www.w3.org/ns/dpv#consented"){
+            const div_greenButton = document.createElement("button");
+            div_greenButton.className = "ui red toggle approve button answer index_" + i.toString();
+            div_greenButton.id = "greenButtonID" + i.toString();
+            div_greenButton.textContent = "Decline";
+            document.getElementById('buttonsID' + i.toString()).appendChild(div_greenButton);
+
+            const div_greyButton = document.createElement("button");
+            div_greyButton.className = "ui toggle cancel button answer index_" + i.toString();
+            div_greyButton.id = "greyButtonID" + i.toString();
+            div_greyButton.textContent = "Withdraw my approval";
+            document.getElementById('buttonsID' + i.toString()).appendChild(div_greyButton);
+
+        }else if(requestContentList[i].participation == "http://www.w3.org/ns/dpv#declined"){
+
+            const div_greenButton = document.createElement("button");
+            div_greenButton.className = "ui green toggle approve button answer index_" + i.toString();
+            div_greenButton.id = "greenButtonID" + i.toString();
+            div_greenButton.textContent = "Approve";
+            document.getElementById('buttonsID' + i.toString()).appendChild(div_greenButton);
+
+            const div_greyButton = document.createElement("button");
+            div_greyButton.className = "ui toggle cancel button answer index_" + i.toString();
+            div_greyButton.id = "greyButtonID" + i.toString();
+            div_greyButton.textContent = "Withdraw my decline";
+            document.getElementById('buttonsID' + i.toString()).appendChild(div_greyButton);
+        }
+
+
+
+
+        $(document)
+        .ready(function () {
+            let modal_para = ".ui.modal.request.index_" + i.toString();
+            let button_para = ".readMore.button.index_" + i.toString();
+            $(modal_para)
+                .modal('attach events', button_para, 'show')
+                ;
+        });
     };
+
+    if (open_count == false){
+        cleanContainer.innerHTML = "<h2>You have no open requests<\h2>";
+    }else if (approved_count ==false){
+        ApprovedContainer.innerHTML = "<h2>You have no approved requests<\h2>";
+    }else if (declined_count == false){
+        declinedContainer.innerHTML = "<h2>You have no declined requests<\h2>";
+    }
     return requestContentList;
 };
 // *** Write and generate requests to cards (END) ***//
@@ -1590,52 +1569,41 @@ function respondToRequest(answer_btns, requestContentList) {
             const selectedRequest = requestContentList[index];
 
             // Participate in a data request
-            if (style.contains('Approve')) {
+            if (style.contains('approve')) {
                 const fetchParticipateRequestId = selectedRequest.url;
-                const participate_period = new Date(document.getElementById("untilDate" + index).value);
-                const data_recipient = document.getElementById("data_recipient" + index).value;
 
-                getWebId().then(webId => {
-                    fetchRequestURL(fetchParticipateRequestId).then(fetchedRequestListRef => {
-                        const collectionSize = fetchedRequestListRef.getSubject(fetchParticipateRequestId).getInteger(requestCollectionSizeGlobal);
-                        const endDate = fetchedRequestListRef.getSubject(fetchParticipateRequestId).getDateTime(requestExpiryGlobal);
-                        const requestModel = fetchedRequestListRef.getSubject(fetchParticipateRequestId).getString(requestAnalysisLogicGlobal);
-
-                        getParticipateList(webId).then(fetchedParticipateListRef => {
-                            // if the data request is in the regular analysis mode
-                            if (requestModel) {
-                                const aclDocument = webId.split("profile")[0] + "private/" + dataFileName + ".acl"
-
-                                // Disable the grant access step here for CML project
-                                fetchRequestURL(aclDocument).then(AccessControlList => {
-                                  
-                                    addParticipation(webId, fetchedRequestListRef, fetchParticipateRequestId, fetchedParticipateListRef, AccessControlList, collectionSize, endDate, participate_period, data_recipient, false).then(success => { //requestModel.includes('Privacy')
-                                        if (success) {
-                                            alert("Your participation is recorded. Access to your " + dataFileName + " is granted for this research request.");
-                                        }
-                                    }).catch((err) => { alert(err.message); });;
-                                }).catch(() => { alert("If you have not given this SOLID App 'Control' Access, please turn on specific sharing for your " + dataFileName + " file ."); });
-                            }
-                        });
-                    });
+                fetchRequestURL(fetchParticipateRequestId).then(fetchedRequestListRef => {
+                    change_participation(fetchedRequestListRef, fetchParticipateRequestId, "http://www.w3.org/ns/dpv#consented").then(()=> {}); //alert('You have accepted the request!')
                 });
-            }else if (style.contains('sendFeedback')) {
-                console.log(style.value)
 
-                getWebId().then(participant_webid => {
-                    console.log(document.getElementById("feedback_from_participantID" + index))
-                    const feedback_text = document.getElementById("feedback_from_participantID" + index).value;
-                    const selectedRequest = requestContentList[index];
-                    sendFeedbackMsg(selectedRequest.url, selectedRequest.webid, participant_webid, feedback_text).then(response => { alert(response) });
-                }).catch((err) => { alert(err.message); });
+                
+            }
+            else if (style.contains('deny')) { //sendFeedback
+                const fetchParticipateRequestId = selectedRequest.url;
 
+                fetchRequestURL(fetchParticipateRequestId).then(fetchedRequestListRef => {
+                    change_participation(fetchedRequestListRef, fetchParticipateRequestId, "http://www.w3.org/ns/dpv#declined").then(()=> {}); //alert('You have declined the request!')
+                });
+            }
+            else if (style.contains('cancel')) { //sendFeedback
+                const fetchParticipateRequestId = selectedRequest.url;
+
+                fetchRequestURL(fetchParticipateRequestId).then(fetchedRequestListRef => {
+                    change_participation(fetchedRequestListRef, fetchParticipateRequestId, "http://www.w3.org/ns/dpv#open").then(()=> {}); //alert('You have declined the request!')
+                });
+
+               
             }
         });
     });
 }
 // *** Users respond to data request: approve/decline (END) ***//
 
-
+async function change_participation(fetchedRequestListRef,fetchParticipateRequestId, status) {
+    const featched_requestParticipation = fetchedRequestListRef.getSubject(fetchParticipateRequestId);
+    featched_requestParticipation.setRef("http://www.w3.org/ns/dpv#participation", status);
+    await fetchedRequestListRef.save()
+}
 
 async function dataElement_getRecommender(input) {
 
