@@ -1371,7 +1371,7 @@ async function generateCards(requestContentList, userRole, session, participant_
             document.getElementById('extraID' + i.toString()).appendChild(div_untilDate_des);
     
             const div_forDate = document.createElement("div");
-            div_forDate.className = "ui transparent input";
+            div_forDate.className = "ui input";
             div_forDate.id = "forDate" + i.toString();
             document.getElementById('untilDate_des' + i.toString()).appendChild(div_forDate);
 
@@ -1440,7 +1440,7 @@ async function generateCards(requestContentList, userRole, session, participant_
 
         }else if(requestContentList[i].participation == "http://www.w3.org/ns/dpv#consented"){
             const div_greenButton = document.createElement("button");
-            div_greenButton.className = "ui red toggle approve button answer index_" + i.toString();
+            div_greenButton.className = "ui red toggle deny button answer index_" + i.toString();
             div_greenButton.id = "greenButtonID" + i.toString();
             div_greenButton.textContent = "Decline";
             document.getElementById('buttonsID' + i.toString()).appendChild(div_greenButton);
