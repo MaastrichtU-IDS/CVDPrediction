@@ -876,6 +876,43 @@ async function getRecommender(input) {
 
 function getDataLabels(input) {
     let code_dict = {
+        14089001: " - Aantal rode bloedcellen",
+        184099003: " - Geboortedatum",
+        224209007: " - Woon- en verblijfssituatie",
+        266995000: " - Geschiedenis van cardiovasculaire ziekte",
+        271649006: " - Systolische bloeddruk",
+        414798009: " - N-terminaal pro-B-type natriuretisch peptide",
+        439401001: " - Diagnose",
+        67079006: " - Glucose waarde",
+        75672003: " - Bepaling van het gemiddelde bloedplaatjesvolume",
+
+        398192003: " - Bijkomende aandoeningen",
+        182833002: " - Medication given",
+        401207004: " - Aanwezige bijwerkingen van medicatie",
+        92818009: " - Chronische myeloïde leukemie",
+
+        22232009: " - Ziekenhuis",
+        263495000: " - Geslacht",
+
+        D007182: " - Inkomen",
+        D007341: " - Verzekeringsinformatie",
+        118598001: " - Eigendomsinformatie",
+        224164009: " - Financiële omstandigheden",
+
+        252150008: " - Lipide elementen",
+        38082009: " - Hemoglobine",
+        56564003: " - BCR-ABL proteïne",
+        6684200: " - Red cell distribution width",
+
+
+        14679004: " - Beroep",
+        397669002: " - Leeftijd",
+        409073007: " - Opleidingsniveau",
+        703503000: " - Naam"
+
+    }
+
+    let code_dict_en = {
         14089001: " - Red blood cell count",
         184099003: " - Date of birth",
         224209007: " - Residence and accommodation circumstances",
@@ -897,7 +934,7 @@ function getDataLabels(input) {
         D007182: " - Income",
         D007341: " - Insurance",
         118598001: " - Property",
-        224164009: " - Financial circumstances",
+        224164009: " -  Financial circumstances",
 
         252150008: " - Lipid elements",
         38082009: " - Hemoglobin",
@@ -1004,13 +1041,13 @@ function writeAllRequest(profile, requestTriples, fetchRequest) {
 async function generateCards(requestContentList, userRole, session, participant_basket) {
 
     var cleanContainer = document.getElementById("OpenContainer");
-    cleanContainer.innerHTML = "<h2>Open requests<\h2>";
+    cleanContainer.innerHTML = "<h2>Openstaande verzoeken<\h2>"; //"<h2>Open requests<\h2>";
 
     var ApprovedContainer = document.getElementById("ApprovedContainer");
-    ApprovedContainer.innerHTML = "<h2>Approved requests<\h2>";
+    ApprovedContainer.innerHTML = "<h2>Geaccepteerde verzoeken<\h2>"; //"<h2>Approved requests<\h2>";
 
     var declinedContainer = document.getElementById("DeclinedContainer");
-    declinedContainer.innerHTML = "<h2>Declined requests<\h2>";
+    declinedContainer.innerHTML = "<h2>Afgewezen verzoeken<\h2>"; //"<h2>Declined requests<\h2>";
 
     const div_open_cardsContainer = document.createElement("div");
     div_open_cardsContainer.className = "ui fluid fixed cards";
@@ -1029,7 +1066,17 @@ async function generateCards(requestContentList, userRole, session, participant_
     
 
     let purpose_label = {
-        CommercialResearch: "orange",
+        CommercieelOnderzoek: "orange", 
+        OnderzoekEnOntwikkeling: "blue",
+        // Security: "green",
+        RegistratieAuthenticatie: "yellow",
+        GepersonaliseerdeAanbevelingenMaken: "teal",
+        // ServiceProvision: "red",
+        // LegalObligation: "purple"
+    }
+
+    let purpose_label_en = {
+        CommercialResearch: "orange", 
         ResearchAndDevelopment: "blue",
         Security: "green",
         RegistrationAuthentication: "yellow",
@@ -1063,7 +1110,7 @@ async function generateCards(requestContentList, userRole, session, participant_
         }
 
 
-        const div_label = document.createElement("a");
+        const div_label = document.createElement("div");
         let purpose_label_content = requestContentList[i].purposeClass.split(",")[0].toString().split(": ")[1].split("#")[1];
         div_label.className = "ui " + purpose_label[purpose_label_content] + " ribbon label";
         div_label.id = "labelID" + i.toString();
@@ -1099,7 +1146,7 @@ async function generateCards(requestContentList, userRole, session, participant_
         const div_description = document.createElement("div");
         div_description.className = "description";
         div_description.id = "descriptionID" + i.toString();
-        div_description.textContent = "Study description: " + requestContentList[i].purpose; //"Purpose description";
+        div_description.textContent = "Beschrijving van het onderzoek:  " + requestContentList[i].purpose; //"Purpose description";
         document.getElementById('contentID' + i.toString()).appendChild(div_description);
 
 
@@ -1110,7 +1157,7 @@ async function generateCards(requestContentList, userRole, session, participant_
         
         const div_readMoreButton = document.createElement("div");
         div_readMoreButton.className = "ui buttom attached readMore button index_" + i.toString();
-        div_readMoreButton.textContent = "Read more";
+        div_readMoreButton.textContent = "Lees verder"; //"Read more";
         div_readMoreButton.id = "readMoreButton" + i.toString();
         document.getElementById('extraContent' + i.toString()).appendChild(div_readMoreButton);
 
@@ -1138,7 +1185,7 @@ async function generateCards(requestContentList, userRole, session, participant_
 
         let addHeader_purpose = document.createElement("h5");
         addHeader_purpose.className = "header"
-        addHeader_purpose.textContent =  "Purpose of data request:";
+        addHeader_purpose.textContent =  "Doel van gegevensaanvraag:"; //"Purpose of data request:";
         document.getElementById("extra_windowContent" + i.toString()).appendChild(addHeader_purpose);
 
         const div_classPurpose = document.createElement("div");
@@ -1152,7 +1199,7 @@ async function generateCards(requestContentList, userRole, session, participant_
 
         let addHeader_description = document.createElement("h5");
         addHeader_description.className = "header"
-        addHeader_description.textContent =  "Study description:";
+        addHeader_description.textContent =  "Beschrijving van het onderzoek: "; //"Study description:";
         document.getElementById("extra_windowContent" + i.toString()).appendChild(addHeader_description);
 
         const div_windowDescription = document.createElement("div");
@@ -1164,7 +1211,7 @@ async function generateCards(requestContentList, userRole, session, participant_
 
         let addHeader_category = document.createElement("h5");
         addHeader_category.className = "header"
-        addHeader_category.textContent =  "Personal Data Category: "; 
+        addHeader_category.textContent =  "Persoonlijke gegevenscategorie"; //"Personal Data Category: "; 
         document.getElementById("extra_windowContent" + i.toString()).appendChild(addHeader_category);
 
         // const div_personalDataCategory = document.createElement("div");
@@ -1200,7 +1247,7 @@ async function generateCards(requestContentList, userRole, session, participant_
 
         let addHeader_dataProcessingCategory = document.createElement("h5");
         addHeader_dataProcessingCategory.className = "header"
-        addHeader_dataProcessingCategory.textContent =  "Data Processing Category: ";
+        addHeader_dataProcessingCategory.textContent =  "Gegevensverwerking categorie: "; //"Data Processing Category: ";
         document.getElementById("extra_windowContent" + i.toString()).appendChild(addHeader_dataProcessingCategory);
 
         // const div_dataProcessingCategory = document.createElement("div");
@@ -1238,7 +1285,7 @@ async function generateCards(requestContentList, userRole, session, participant_
         // Request data elements
         let addHeader_dataelement= document.createElement("h5");
         addHeader_dataelement.className = "header"
-        addHeader_dataelement.textContent =  "Requested data: "; 
+        addHeader_dataelement.textContent =  "Noodzakelijke gegevens: "; //"Requested data: "; 
         document.getElementById("extra_windowContent" + i.toString()).appendChild(addHeader_dataelement);
 
         // const div_dataElement = document.createElement("div");
@@ -1311,7 +1358,7 @@ async function generateCards(requestContentList, userRole, session, participant_
         
         let addHeader_period= document.createElement("h5");
         addHeader_period.className = "header"
-        addHeader_period.textContent =  "Your data will be collected and used until: "; 
+        addHeader_period.textContent =  "Uw gegevens worden bewaard en gebruikt tot: " ;//"Your data will be collected and used until: "; 
         document.getElementById("extra_windowContent" + i.toString()).appendChild(addHeader_period);
 
         const div_period = document.createElement("div");
@@ -1323,7 +1370,7 @@ async function generateCards(requestContentList, userRole, session, participant_
         
         let addHeader_instance= document.createElement("h5");
         addHeader_instance.className = "header"
-        addHeader_instance.textContent =  "Expected number of participants: "; 
+        addHeader_instance.textContent =  "Verwacht hoeveelheid deelnemers:"; //"Expected number of participants: "; 
         document.getElementById("extra_windowContent" + i.toString()).appendChild(addHeader_instance);
 
         const div_numInstance = document.createElement("div");
@@ -1335,7 +1382,7 @@ async function generateCards(requestContentList, userRole, session, participant_
 
         let addHeader_analysis= document.createElement("h5");
         addHeader_analysis.className = "header"
-        addHeader_analysis.textContent =  "Planned analysis: "; 
+        addHeader_analysis.textContent =  "Geplande analyse: "; //"Planned analysis: "; 
         document.getElementById("extra_windowContent" + i.toString()).appendChild(addHeader_analysis);
 
         const div_analysis = document.createElement("div");
@@ -1347,7 +1394,7 @@ async function generateCards(requestContentList, userRole, session, participant_
         
         let addHeader_impact= document.createElement("h5");
         addHeader_impact.className = "header"
-        addHeader_impact.textContent =  "Anticipated impact: "; 
+        addHeader_impact.textContent =  "Verwachte impact: "; //"Anticipated impact: "; 
         document.getElementById("extra_windowContent" + i.toString()).appendChild(addHeader_impact);
 
         const div_consequence = document.createElement("div");
@@ -1367,7 +1414,7 @@ async function generateCards(requestContentList, userRole, session, participant_
             const div_untilDate_des = document.createElement("h5");
             div_untilDate_des.className = "ui green header";
             div_untilDate_des.id = "untilDate_des" + i.toString();
-            div_untilDate_des.textContent = "I would like to give consent to this study to use my data until : "
+            div_untilDate_des.textContent = "Ik wil toestemming geven voor deze studie om mijn gegevens te gebruiken tot:  "; //"I would like to give consent to this study to use my data until : "
             document.getElementById('extraID' + i.toString()).appendChild(div_untilDate_des);
     
             const div_forDate = document.createElement("div");
@@ -1387,7 +1434,7 @@ async function generateCards(requestContentList, userRole, session, participant_
 
             const checkbox_label = document.createElement("h5");
             checkbox_label.className = "ui green header"
-            checkbox_label.textContent = "I would like to receive the final results of this study. (If yes, check the box) "
+            checkbox_label.textContent = "Ik wil graag de eindresultaten van deze studie ontvangen. (Indien ja, vink het vakje aan)  "; //"I would like to receive the final results of this study. (If yes, check the box) "
             checkbox_label.id = "label" + i.toString();
             document.getElementById("inline_field" + i.toString()).appendChild(checkbox_label);
 
@@ -1429,26 +1476,26 @@ async function generateCards(requestContentList, userRole, session, participant_
             const div_greenButton = document.createElement("button");
             div_greenButton.className = "ui green toggle approve button answer index_" + i.toString();
             div_greenButton.id = "greenButtonID" + i.toString();
-            div_greenButton.textContent = "Approve";
+            div_greenButton.textContent = "Goedkeuren"; //"Approve";
             document.getElementById('buttonsID' + i.toString()).appendChild(div_greenButton);
 
             const div_redButton = document.createElement("button");
             div_redButton.className = "ui red toggle deny button answer index_" + i.toString();
             div_redButton.id = "redButtonID" + i.toString();
-            div_redButton.textContent = "Decline";
+            div_redButton.textContent = "Afwijzen"; //"Decline";
             document.getElementById('buttonsID' + i.toString()).appendChild(div_redButton);
 
         }else if(requestContentList[i].participation == "http://www.w3.org/ns/dpv#consented"){
             const div_greenButton = document.createElement("button");
             div_greenButton.className = "ui red toggle deny button answer index_" + i.toString();
             div_greenButton.id = "greenButtonID" + i.toString();
-            div_greenButton.textContent = "Decline";
+            div_greenButton.textContent = "Afwijzen"; //"Decline";
             document.getElementById('buttonsID' + i.toString()).appendChild(div_greenButton);
 
             const div_greyButton = document.createElement("button");
             div_greyButton.className = "ui toggle cancel button answer index_" + i.toString();
             div_greyButton.id = "greyButtonID" + i.toString();
-            div_greyButton.textContent = "Withdraw my approval";
+            div_greyButton.textContent = "Mijn toestemming intrekken"; //"Withdraw my approval";
             document.getElementById('buttonsID' + i.toString()).appendChild(div_greyButton);
 
         }else if(requestContentList[i].participation == "http://www.w3.org/ns/dpv#declined"){
@@ -1456,13 +1503,13 @@ async function generateCards(requestContentList, userRole, session, participant_
             const div_greenButton = document.createElement("button");
             div_greenButton.className = "ui green toggle approve button answer index_" + i.toString();
             div_greenButton.id = "greenButtonID" + i.toString();
-            div_greenButton.textContent = "Approve";
+            div_greenButton.textContent = "Goedkeuren"; //"Approve";
             document.getElementById('buttonsID' + i.toString()).appendChild(div_greenButton);
 
             const div_greyButton = document.createElement("button");
             div_greyButton.className = "ui toggle cancel button answer index_" + i.toString();
             div_greyButton.id = "greyButtonID" + i.toString();
-            div_greyButton.textContent = "Withdraw my decline";
+            div_greyButton.textContent = "Mijn afwijzing intrekken";// "Withdraw my decline";
             document.getElementById('buttonsID' + i.toString()).appendChild(div_greyButton);
         }
 
@@ -1480,11 +1527,11 @@ async function generateCards(requestContentList, userRole, session, participant_
     };
 
     if (open_count == false){
-        cleanContainer.innerHTML = "<h2>You have no open requests<\h2>";
+        cleanContainer.innerHTML = "<h2>U heeft geen openstaande verzoeken.<\h2>"; //"<h2>You have no open requests<\h2>";
     }else if (approved_count ==false){
-        ApprovedContainer.innerHTML = "<h2>You have no approved requests<\h2>";
+        ApprovedContainer.innerHTML = "<h2>U heeft geen Geaccepteerde verzoeken<\h2>"; //"<h2>You have no approved requests<\h2>";
     }else if (declined_count == false){
-        declinedContainer.innerHTML = "<h2>You have no declined requests<\h2>";
+        declinedContainer.innerHTML = "<h2>U heeft geen Afgewezen verzoeken<\h2>"; //"<h2>You have no declined requests<\h2>";
     }
     return requestContentList;
 };
