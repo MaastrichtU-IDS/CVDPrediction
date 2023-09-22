@@ -1139,7 +1139,7 @@ async function generateCards(requestContentList, userRole, session, participant_
         const div_meta = document.createElement("div");
         div_meta.className = "description";
         div_meta.id = "metaID" + i.toString();
-        div_meta.textContent = "Requested by " + requestContentList[i].name + " from " + requestContentList[i].organization; //"IDS";
+        div_meta.textContent = "Op verzoek van " + requestContentList[i].name + " van " + requestContentList[i].organization; //"IDS";
         // div_meta.href = requestContentList[i].url.toString().split("/public/")[0] + "/profile/card#me"
         document.getElementById('contentID' + i.toString()).appendChild(div_meta);
 
