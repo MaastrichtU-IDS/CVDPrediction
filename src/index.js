@@ -1114,7 +1114,9 @@ async function generateCards(requestContentList, userRole, session, participant_
         let purpose_label_content = requestContentList[i].purposeClass.split(",")[0].toString().split(": ")[1].split("#")[1];
         div_label.className = "ui " + purpose_label[purpose_label_content] + " ribbon label";
         div_label.id = "labelID" + i.toString();
-        div_label.textContent = purpose_label_content.toString().replace(/([A-Z][a-z])/g, ' $1').trim();
+        let text_1 = purpose_label_content.toString().replace(/([A-Z][a-z])/g, ' $1').trim();
+        div_label.textContent = text_1.charAt(0) + text_1.substring(1).toLowerCase();
+        
         document.getElementById('cardID' + i.toString()).appendChild(div_label);
 
         const div_content = document.createElement("div");
@@ -1192,7 +1194,8 @@ async function generateCards(requestContentList, userRole, session, participant_
         div_classPurpose.className = "description";
         div_classPurpose.id = "classPurposeID" + i.toString();
         const listofpurpose = requestContentList[i].purposeClass.split(",")
-        div_classPurpose.textContent = listofpurpose[0].toString().split(": ")[1].split("#")[1].replace(/([A-Z][a-z])/g, ' $1').trim(); //equestContentList[i].purposeClass; //"Purpose Class";
+        let text_2 = listofpurpose[0].toString().split(": ")[1].split("#")[1].replace(/([A-Z][a-z])/g, ' $1').trim();
+        div_classPurpose.textContent =  text_2.charAt(0) + text_2.substring(1).toLowerCase();//equestContentList[i].purposeClass; //"Purpose Class";
         document.getElementById('extra_windowContent' + i.toString()).appendChild(div_classPurpose);
 
       
@@ -1224,7 +1227,9 @@ async function generateCards(requestContentList, userRole, session, participant_
 
         const listofpersonalDataCategory = requestContentList[i].personalDataCategory.split(",");
         let href_personalDataCategory = document.createElement("div");
-        let link_personalDataCategory = document.createTextNode(" - "+listofpersonalDataCategory[0].toString().split(": ")[1].split("#")[1].replace(/([A-Z][a-z])/g, ' $1').trim());
+        let text_3 = listofpersonalDataCategory[0].toString().split(": ")[1].split("#")[1].replace(/([A-Z][a-z])/g, ' $1').trim();
+
+        let link_personalDataCategory = document.createTextNode(" - "+text_3.charAt(0) + text_3.substring(1).toLowerCase());
         href_personalDataCategory.appendChild(link_personalDataCategory);
         document.getElementById('extra_windowContent' + i.toString()).appendChild(href_personalDataCategory);
 
@@ -1233,7 +1238,9 @@ async function generateCards(requestContentList, userRole, session, participant_
             if (itr < listofpersonalDataCategory.length) {
                 document.getElementById('extra_windowContent' + i.toString()).appendChild(document.createElement("div"));
                 let href_personalDataCategory_1 = document.createElement("div");
-                let link_personalDataCategory = document.createTextNode(" - "+listofpersonalDataCategory[itr].toString().split("#")[1].replace(/([A-Z][a-z])/g, ' $1').trim());
+                
+                let text_4 = listofpersonalDataCategory[itr].toString().split("#")[1].replace(/([A-Z][a-z])/g, ' $1').trim();
+                let link_personalDataCategory = document.createTextNode(" - "+text_4.charAt(0) + text_4.substring(1).toLowerCase());
                 href_personalDataCategory_1.appendChild(link_personalDataCategory);
                 // href_personalDataCategory_1.textContent = listofpersonalDataCategory[itr].replace(/([A-Z][a-z])/g, ' $1').trim();
                 document.getElementById('extra_windowContent' + i.toString()).appendChild(href_personalDataCategory_1);
@@ -1259,7 +1266,10 @@ async function generateCards(requestContentList, userRole, session, participant_
 
         const listofdataProcessingCategory = requestContentList[i].dataProcessingCategory.split(",");
         let href_dataProcessingCategory = document.createElement("div");
-        let link_dataProcessingCategory = document.createTextNode(" - "+listofdataProcessingCategory[0].toString().split(": ")[1].split("#")[1].replace(/([A-Z][a-z])/g, ' $1').trim());
+
+
+        let text_6 = listofdataProcessingCategory[0].toString().split(": ")[1].split("#")[1].replace(/([A-Z][a-z])/g, ' $1').trim();
+        let link_dataProcessingCategory = document.createTextNode(" - "+text_6.charAt(0) + text_6.substring(1).toLowerCase());
         href_dataProcessingCategory.appendChild(link_dataProcessingCategory);
         // href_dataProcessingCategory.textContent = listofdataProcessingCategory[0].toString().split(": ")[1].replace(/([A-Z][a-z])/g, ' $1').trim();
         document.getElementById('extra_windowContent' + i.toString()).appendChild(href_dataProcessingCategory);
@@ -1269,7 +1279,10 @@ async function generateCards(requestContentList, userRole, session, participant_
             if (itr < listofdataProcessingCategory.length) {
                 document.getElementById('extra_windowContent' + i.toString()).appendChild(document.createElement("div"));
                 let href_dataProcessingCategory_1 = document.createElement("div");
-                let link_dataProcessingCategory = document.createTextNode(" - "+listofdataProcessingCategory[itr].toString().split("#")[1].replace(/([A-Z][a-z])/g, ' $1').trim());
+
+                let text_8 = listofdataProcessingCategory[itr].toString().split("#")[1].replace(/([A-Z][a-z])/g, ' $1').trim();
+
+                let link_dataProcessingCategory = document.createTextNode(" - "+text_8.charAt(0) + text_8.substring(1).toLowerCase());
                 href_dataProcessingCategory_1.appendChild(link_dataProcessingCategory);
                 // href_dataProcessingCategory_1.textContent = listofdataProcessingCategory[itr].replace(/([A-Z][a-z])/g, ' $1').trim();
                 document.getElementById('extra_windowContent' + i.toString()).appendChild(href_dataProcessingCategory_1);
@@ -1370,7 +1383,7 @@ async function generateCards(requestContentList, userRole, session, participant_
         
         let addHeader_instance= document.createElement("h5");
         addHeader_instance.className = "header"
-        addHeader_instance.textContent =  "Verwacht hoeveelheid deelnemers:"; //"Expected number of participants: "; 
+        addHeader_instance.textContent =  "Verwachte hoeveelheid deelnemers:"; //"Expected number of participants: "; 
         document.getElementById("extra_windowContent" + i.toString()).appendChild(addHeader_instance);
 
         const div_numInstance = document.createElement("div");
@@ -1414,7 +1427,7 @@ async function generateCards(requestContentList, userRole, session, participant_
             const div_untilDate_des = document.createElement("h5");
             div_untilDate_des.className = "ui green header";
             div_untilDate_des.id = "untilDate_des" + i.toString();
-            div_untilDate_des.textContent = "Ik wil toestemming geven voor deze studie om mijn gegevens te gebruiken tot:  "; //"I would like to give consent to this study to use my data until : "
+            div_untilDate_des.textContent = "Ik wil toestemming geven voor dit onderzoek om mijn gegevens te gebruiken tot:  "; //"I would like to give consent to this study to use my data until : "
             document.getElementById('extraID' + i.toString()).appendChild(div_untilDate_des);
     
             const div_forDate = document.createElement("div");
@@ -1434,7 +1447,7 @@ async function generateCards(requestContentList, userRole, session, participant_
 
             const checkbox_label = document.createElement("h5");
             checkbox_label.className = "ui green header"
-            checkbox_label.textContent = "Ik wil graag de eindresultaten van deze studie ontvangen. (Indien ja, vink het vakje aan)  "; //"I would like to receive the final results of this study. (If yes, check the box) "
+            checkbox_label.textContent = "Ik wil graag de eindresultaten van dit onderzoek ontvangen. (Indien ja, vink het vakje aan)  "; //"I would like to receive the final results of this study. (If yes, check the box) "
             checkbox_label.id = "label" + i.toString();
             document.getElementById("inline_field" + i.toString()).appendChild(checkbox_label);
 
