@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>House Price Prediction</title>
+  <style>
+      body {
+          font-family: Arial, sans-serif;
+          background-color: #f5f5f5;
+          text-align: center;
+          padding: 20px;
+      }
+
+      h3 {
+          color: #3c78cc;
+      }
+      h4 {
+            text-align: center;
+            color: #3c78cc;
+        }
+
+        .divider {
+            background-color: #3c78cc;
+            height: 1px;
+        }
+
+      form {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            padding: 20px;
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+            max-width: 600px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-gap: 10px;
+            margin: 0 auto;
+        }
+
+      label {
+          /* display: block; */
+          text-align: right;
+          margin-bottom: 5px;
+          font-weight: bold;
+          margin-top: 9px;
+      }
+
+      input[type="number"] {
+          width: 80%;
+          padding: 8px;
+          margin-bottom: 5px;
+          border: 2px solid #ccc;
+          border-radius: 8px;
+      }
+
+      input[type="submit"] {
+          background-color: #3c78cc;
+          color: white;
+          padding: 10px 20px;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+          margin-top: 15px;
+      }
+
+      input[type="submit"]:hover {
+          background-color: #3c78cc;
+      }
+
+      p {
+          font-size: 18px;
+          font-weight: bold;
+          margin-top: 40px;
+          color: rgb(184, 61, 61);
+      }
+      select {
+          width: 87%;
+          padding: 8px;
+          margin-bottom: 5px;
+          border: 2px solid #ccc;
+          border-radius: 8px;
+          background-color: #f8f8f8;
+        }
+
+   #predicted_risk {
+      width: 100%;
+      height: 100%;
+   }
+</style>
+  </style>
+</head>
+
+<body>
+
+    <h3>Cardiovascular Disease (CVD) Predictor for Chronic Myelogenous Leukemia (CML) Patients</h3>
+    <h4>Please input your patient's data in the form</h4>
+
+
+
+    {% if predicted_risk is not none %}
+      {% if model == "LR" or model =="SVM" or model == "XGB" %}
+        <p>The probability of having CVD is {{ predicted_risk }}%</p>
+      {% endif %}
+
+      {% if model == "LR_explainer" or model =="SVM_explainer" or model == "XGB_explainer" %}
+        {% for i in predicted_risk: %}
+          <iframe id="predicted_risk" srcdoc="{{predicted_risk[i]}}"></iframe>
+        {% endfor %}
+      {% endif %}
+    {% endif %}
+
+
+  <!-- <img class="img" src="assets/images/temp.png" /> -->
+  {% for i in shap_plots: %}
+    <iframe id="shap_plots" srcdoc="{{shap_plots[i]}}"></iframe>
+  {% endfor %}
+  <form method="POST" action="/">
+    
+    <h4>Demongraphic and health: </h4>
+    <br>
+    
+    <label for="anchor_age">Age:</label>
+    <input type="number" id="anchor_age" name="anchor_age" placeholder="Years old" step="1" value="{{ anchor_age }}" required>
+
+    <label for="bmi">BMI:</label>
+    <input type="number" id="bmi" name="bmi" placeholder="kg/m²" step="any" value="{{ bmi }}"required>
+
+    <label for="diastolic">Diastolic:</label>
+    <input type="number" id="diastolic" placeholder="mmHg" name="diastolic" step="any" value="{{ diastolic }}" required>
+
+    <label for="systolic">Systolic:</label>
+    <input type="number" id="systolic" placeholder="mmHg" name="systolic" step="any" value="{{ systolic }}" required>
+
+
+    <label>Gender: </label>
+    <select id="gender" name="gender" required>
+      <!-- <option value=""> Select from the options </option> -->
+      <option value=0 {% if gender ==0 %} selected {% endif %}>  Male  </option>
+      <option value=1 {% if gender ==1 %} selected {% endif %}>  Female  </option>
+    </select>
+
+    <label>Diabetes mellitus: </label>
+    <select id="diabetes" name="diabetes" required>
+      <!-- <option value="">  Unknown  </option> -->
+      <option value=0 {% if diabetes ==0 %} selected {% endif %}>  No  </option>
+      <option value=1 {% if diabetes ==1 %} selected {% endif %}>  Yes  </option>
+    </select>
+
+    <label>Chronic kidney disease: </label>
+    <select id="kidney" name="kidney" required>
+      <!-- <option value="">  Unknown  </option> -->
+      <option value=0 {% if kidney ==0 %} selected {% endif %}>  No  </option>
+      <option value=1 {% if kidney ==1 %} selected {% endif %}>  Yes  </option>
+    </select>
+
+    <h4>Laboratory Tests data: </h4>
+    <br>
+
+    <label for="Red_Blood_Cells">Red Blood Cells:</label>
+    <input type="number" id="Red_Blood_Cells" name="Red_Blood_Cells" placeholder="m/uL" step="any" value="{{ Red_Blood_Cells }}" required>
+
+    <label for="Urea_Nitrogen">Urea Nitrogen:</label>
+    <input type="number" id="Urea_Nitrogen" name="Urea_Nitrogen" placeholder="mg/dL" step="any" value="{{ Urea_Nitrogen }}" required>
+
+
+    <label for="Albumin">Albumin:</label>
+    <input type="number" id="Albumin" name="Albumin" placeholder="g/dL" step="any" value="{{ Albumin }}" required>
+
+    <label for="Lactate _Dehydrogenase">Lactate Dehydrogenase:</label>
+    <input type="number" id="Lactate_Dehydrogenase" name="Lactate_Dehydrogenase" placeholder="IU/L" step="any" value="{{ Lactate_Dehydrogenase }}" required>
+
+
+    <label for="Metamyelocytes">Metamyelocytes:</label>
+    <input type="number" id="Metamyelocytes" name="Metamyelocytes" placeholder="%" step="1" value="{{ Metamyelocytes }}" required>
+
+    <label for="Cholesterol_Total">Cholesterol:</label>
+    <input type="number" id="Cholesterol_Total" name="Cholesterol_Total" placeholder="Total, mg/dL" step="any" value="{{ Cholesterol_Total }}" required>
+
+
+    <label for="Hemoglobin_A1c">Hemoglobin A1c:</label>
+    <input type="number" id="Hemoglobin_A1c" name="Hemoglobin_A1c" placeholder="%" step="1" value="{{ Hemoglobin_A1c }}" required>
+
+    <label for="Glucose">Glucose:</label>
+    <input type="number" id="Glucose" name="Glucose" placeholder="mg/dL" step="any" value="{{ Glucose }}" required>
+    
+
+    <h4>CML treatment (TKI) data: </h4>
+    <br>
+
+    <label>TKI type: </label>
+    <select id="drug" name="drug" required>
+      <option value="None" {% if drug =="None" %} selected {% endif %}>None</option>
+      <option value="Imatinib" {% if drug =="Imatinib" %} selected {% endif %}>  Imatinib  </option>
+      <option value="Dasatinib" {% if drug =="Dasatinib" %} selected {% endif %}>  Dasatinib  </option>
+      <option value="Nilotinib" {% if drug =="Nilotinib" %} selected {% endif %}>  Nilotinib  </option>
+    </select>
+
+    <label for="dose">Dose:</label>
+    <input type="number" id="dose" name="dose" placeholder="mg/per day" step="any" value="{{ dose }}" required>
+
+    <h4>Predictive models: </h4>
+    <br>
+
+    <label>Choose a model: </label>
+    <select id="model" name="model" required>
+      <option value="LR" {% if model =="LR" %} selected {% endif %}>Logistic Regression (only prediction)</option>
+      <option value="SVM" {% if model =="SVM" %} selected {% endif %}>  Support Vector Machine (only prediction) </option>
+      <option value="XGB" {% if model =="XGB" %} selected {% endif %}>  XGBoost (only prediction) </option> 
+      <option value="LR_explainer" {% if model =="LR_explainer" %} selected {% endif %}>Logistic Regression (with explainer)</option>
+      <option value="SVM_explainer" {% if model =="SVM_explainer" %} selected {% endif %}>  Support Vector Machine (with explainer) </option>
+      <option value="XGB_explainer" {% if model =="XGB_explainer" %} selected {% endif %}>  XGBoost (with explainer) </option> 
+
+    </select>
+
+    <!-- {% if model is not none %}
+    <script type="text/javascript">
+      document.getElementById('model').value = "123";
+    </script>
+    {% endif %} -->
+
+    
+
+    <br>
+
+    <br>
+    <input type="submit" value="Predict Risk">
+</form>
+
+
+</body>
+
+</html>
