@@ -27,11 +27,11 @@ def cvd_predictor(input_df_data, model):
 
     elif model == "LR_explainer" or model =="SVM_explainer":
         shap_values = loaded_model.shap_values(input_df_data)
-        def _force_plot_html(explainer, shap_values):            
+        def _force_plot_html(explainer, shap_values):
             force_plot = shap.force_plot(explainer.expected_value[1], shap_values[1], input_df_data,  matplotlib=False)
             shap_html = f"<head>{shap.getjs()}</head><body>{force_plot.html()}</body>"
             return shap_html
-        
+
         shap_plots = {}
         for i in range(1): #how many plots you want
             shap_plots[i] = _force_plot_html(loaded_model, shap_values)
@@ -39,7 +39,7 @@ def cvd_predictor(input_df_data, model):
 
     elif model == "XGB_explainer":
         shap_values = loaded_model.shap_values(input_df_data)
-        def _force_plot_html(explainer, shap_values):            
+        def _force_plot_html(explainer, shap_values):
             force_plot = shap.force_plot(explainer.expected_value, shap_values[0, :],input_df_data.iloc[0,:])
             shap_html = f"<head>{shap.getjs()}</head><body>{force_plot.html()}</body>"
             return shap_html
@@ -57,7 +57,7 @@ def cvd_predictor(input_df_data, model):
 
 def home():
     predicted_risk = None
-    
+
     anchor_age = None
     bmi = None
 
@@ -77,7 +77,7 @@ def home():
     drug = None
     dose = None
     model = None
-    
+
     if request.method == 'POST':
 
         anchor_age = float(request.form['anchor_age'])
@@ -99,37 +99,37 @@ def home():
         drug = request.form['drug']
         dose = float(request.form['dose'])
 
-        variable_col = ['gender', 'BMI', 'anchor_age', 'diastolic', 'systolic', 'diabetes', 'kidney', 
+        variable_col = ['gender', 'BMI', 'anchor_age', 'diastolic', 'systolic', 'diabetes', 'kidney',
                         'Red Blood Cells','Urea Nitrogen', 'Albumin', 'Lactate Dehydrogenase (LD)',
                         'Metamyelocytes', 'Cholesterol, Total', '% Hemoglobin A1c', 'Glucose',
                         'drug_Dasatinib', 'drug_Imatinib', 'drug_Nilotinib']
-        
+
         drug_Dasatinib = 0
         drug_Imatinib = 0
         drug_Nilotinib = 0
-        
+
         if drug == "Dasatinib":
             drug_Dasatinib = dose
         elif drug == "Imatinib":
             drug_Imatinib = dose
         elif drug == "Nilotinib":
             drug_Nilotinib = dose
-        
+
         variable_list = [gender, bmi, anchor_age, diastolic, systolic, diabetes, kidney,
                          Red_Blood_Cells, Urea_Nitrogen, Albumin, Lactate_Dehydrogenase,
                          Metamyelocytes, Cholesterol_Total, Hemoglobin_A1c, Glucose,
                          drug_Dasatinib, drug_Imatinib, drug_Nilotinib]
-        
+
         input_df_data = pd.DataFrame(variable_list, index=variable_col).transpose().iloc[0:1]
-        
+
         # Call your machine learning model to make a prediction
         model = request.form['model']
 
         predicted_risk = cvd_predictor(input_df_data, model)
 
     return render_template('cmlCvdPredictor.html',
-                            anchor_age=anchor_age, 
-                            bmi=bmi, 
+                            anchor_age=anchor_age,
+                            bmi=bmi,
                             diastolic=diastolic,
                             systolic=systolic,
                             gender=gender,
