@@ -4,11 +4,11 @@ services:
   cvd-predictor:
     build: .
     restart: unless-stopped
-    # ports:
-    #   - 5001:5001
     environment:
-      VIRTUAL_PORT: 5000
+      VIRTUAL_PORT: 5001
       VIRTUAL_HOST: cvd-predictor.137.120.31.148.nip.io
       LETSENCRYPT_HOST: cvd-predictor.137.120.31.148.nip.io
     volumes:
       - ./:/app/
+    # ports:
+    #   - 5001:5001
