@@ -52,6 +52,9 @@ var joinDataRecipientGlobal = "http://www.w3.org/ns/dpv#hasRecipient";
 var joinhasExpiryGlobal = "http://www.w3.org/ns/dpv#hasExpiry";
 var joinhasExpiryTimeGlobal = "http://www.w3.org/ns/dpv#hasExpiryTime";
 
+var requestStudyPeriod = "http://schema.org/studyPeriod";
+var requestDatePublished = "http://schema.org/datePublished";
+
 
 
 
@@ -1003,6 +1006,14 @@ function writeAllRequest(profile, requestTriples, fetchRequest) {
                 if (requestTriples[i].predicate.id === requestExpiryGlobal) {
                     requestContent.period = requestTriples[i].object.value;
                 }
+                
+                if (requestTriples[i].predicate.id === requestStudyPeriod){
+                  requestContent.studyPeriod = requestTriples[i].object.value;
+                }
+                if (requestTriples[i].predicate.id === requestDatePublished){
+                  requestContent.datePublished = requestTriples[i].object.value;
+                }
+
                 // requestContent.period = "End date: " + "2025-01-01"}
                 if (requestTriples[i].predicate.id === requestAnalysisLogicGlobal) {
                     requestContent.analysis = requestTriples[i].object.value;
@@ -1145,11 +1156,25 @@ async function generateCards(requestContentList, userRole, session, participant_
         // div_meta.href = requestContentList[i].url.toString().split("/public/")[0] + "/profile/card#me"
         document.getElementById('contentID' + i.toString()).appendChild(div_meta);
 
-        const div_description = document.createElement("div");
-        div_description.className = "description";
-        div_description.id = "descriptionID" + i.toString();
-        div_description.textContent = "Beschrijving van het onderzoek:  " + requestContentList[i].purpose; //"Purpose description";
-        document.getElementById('contentID' + i.toString()).appendChild(div_description);
+        // const div_description = document.createElement("div");
+        // div_description.className = "description";
+        // div_description.id = "descriptionID" + i.toString();
+        // div_description.textContent = "Beschrijving van het onderzoek:  " + requestContentList[i].purpose; //"Purpose description";
+        // document.getElementById('contentID' + i.toString()).appendChild(div_description);
+
+
+        const div_modal_datePublished = document.createElement("div");
+        div_modal_datePublished.className = "datePublished";
+        div_modal_datePublished.id = "datePublishedID" + i.toString();
+        div_modal_datePublished.textContent = "Publicatie datum:  " + requestContentList[i].datePublished; //"Purpose description";
+        document.getElementById('contentID' + i.toString()).appendChild(div_modal_datePublished);
+
+        const div_modal_studyPeriod = document.createElement("div");
+        div_modal_studyPeriod.className = "studyPeriod";
+        div_modal_studyPeriod.id = "studyPeriodID" + i.toString();
+        div_modal_studyPeriod.textContent = "Studeer periode:  " + requestContentList[i].studyPeriod; //"Purpose description";
+        document.getElementById('contentID' + i.toString()).appendChild(div_modal_studyPeriod);
+
 
 
         const div_extraContent = document.createElement("div");
@@ -1165,9 +1190,14 @@ async function generateCards(requestContentList, userRole, session, participant_
 
 
         const div_request_modal = document.createElement("div");
-        div_request_modal.className = "ui modal request index_" + i.toString();
+        div_request_modal.className = "ui fullscreen modal request index_" + i.toString();
         div_request_modal.id = "request_modalID" + i.toString();
         document.getElementById("modal_component").appendChild(div_request_modal);
+
+
+        const div_closeicon = document.createElement("i");
+        div_closeicon.className = "close icon";
+        document.getElementById("request_modalID" + i.toString()).appendChild(div_closeicon);
 
         const div_windowHeader = document.createElement("div");
         div_windowHeader.className = "header";
@@ -1183,6 +1213,19 @@ async function generateCards(requestContentList, userRole, session, participant_
         div_extraWindowContent.className = "extra window content";
         div_extraWindowContent.id = "extra_windowContent" + i.toString();
         document.getElementById("request_contentID" + i.toString()).appendChild(div_extraWindowContent);
+
+        
+        let add_datePublished = document.createElement("h5");
+        add_datePublished.className = "header"
+        add_datePublished.textContent =  "Publicatie datum: "; 
+        document.getElementById("extra_windowContent" + i.toString()).appendChild(add_datePublished);
+
+        const div_datePublished = document.createElement("div");
+        div_datePublished.className = "datePublished";
+        div_datePublished.id = "datePublishedID" + i.toString();
+        div_datePublished.textContent = requestContentList[i].datePublished; 
+        document.getElementById('extra_windowContent' + i.toString()).appendChild(div_datePublished);
+
 
 
         let addHeader_purpose = document.createElement("h5");
@@ -1210,6 +1253,19 @@ async function generateCards(requestContentList, userRole, session, participant_
         div_windowDescription.id = "descriptionID" + i.toString();
         div_windowDescription.textContent = requestContentList[i].purpose; //"Purpose description";
         document.getElementById('extra_windowContent' + i.toString()).appendChild(div_windowDescription);
+
+
+        let add_studyPeriod = document.createElement("h5");
+        add_studyPeriod.className = "header"
+        add_studyPeriod.textContent =  "Studeer periode: "; 
+        document.getElementById("extra_windowContent" + i.toString()).appendChild(add_studyPeriod);
+
+        const div_studyPeriod = document.createElement("div");
+        div_studyPeriod.className = "studyPeriod";
+        div_studyPeriod.id = "studyPeriodID" + i.toString();
+        div_studyPeriod.textContent = requestContentList[i].studyPeriod; 
+        document.getElementById('extra_windowContent' + i.toString()).appendChild(div_studyPeriod);
+
 
 
         let addHeader_category = document.createElement("h5");
@@ -1424,21 +1480,21 @@ async function generateCards(requestContentList, userRole, session, participant_
 
         //
         if(requestContentList[i].participation != "http://www.w3.org/ns/dpv#consented"){
-            const div_untilDate_des = document.createElement("h5");
-            div_untilDate_des.className = "ui green header";
-            div_untilDate_des.id = "untilDate_des" + i.toString();
-            div_untilDate_des.textContent = "Ik wil toestemming geven voor dit onderzoek om mijn gegevens te gebruiken tot:  "; //"I would like to give consent to this study to use my data until : "
-            document.getElementById('extraID' + i.toString()).appendChild(div_untilDate_des);
+            // const div_untilDate_des = document.createElement("h5");
+            // div_untilDate_des.className = "ui green header";
+            // div_untilDate_des.id = "untilDate_des" + i.toString();
+            // div_untilDate_des.textContent = "Ik wil toestemming geven voor dit onderzoek om mijn gegevens te gebruiken tot:  "; //"I would like to give consent to this study to use my data until : "
+            // document.getElementById('extraID' + i.toString()).appendChild(div_untilDate_des);
     
-            const div_forDate = document.createElement("div");
-            div_forDate.className = "ui input";
-            div_forDate.id = "forDate" + i.toString();
-            document.getElementById('untilDate_des' + i.toString()).appendChild(div_forDate);
+            // const div_forDate = document.createElement("div");
+            // div_forDate.className = "ui input";
+            // div_forDate.id = "forDate" + i.toString();
+            // document.getElementById('untilDate_des' + i.toString()).appendChild(div_forDate);
 
-            const div_untilDate = document.createElement("input");
-            div_untilDate.type = "date";
-            div_untilDate.id = "untilDate" + i.toString();
-            document.getElementById("forDate" + i.toString()).appendChild(div_untilDate);
+            // const div_untilDate = document.createElement("input");
+            // div_untilDate.type = "date";
+            // div_untilDate.id = "untilDate" + i.toString();
+            // document.getElementById("forDate" + i.toString()).appendChild(div_untilDate);
 
             const div_checkbox_field = document.createElement("div");
             div_checkbox_field.className = "inline field"
@@ -1531,7 +1587,7 @@ async function generateCards(requestContentList, userRole, session, participant_
 
         $(document)
         .ready(function () {
-            let modal_para = ".ui.modal.request.index_" + i.toString();
+            let modal_para = ".ui.fullscreen.modal.request.index_" + i.toString();
             let button_para = ".readMore.button.index_" + i.toString();
             $(modal_para)
                 .modal('attach events', button_para, 'show')
