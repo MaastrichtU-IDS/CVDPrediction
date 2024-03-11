@@ -201,11 +201,11 @@
 
     <label>Choose a model: </label>
     <select id="model" name="model" required>
-      <option value="LR" {% if model =="LR" %} selected {% endif %}>Logistic Regression (only prediction)</option>
-      <option value="SVM" {% if model =="SVM" %} selected {% endif %}>  Support Vector Machine (only prediction) </option>
+<!--       <option value="LR" {% if model =="LR" %} selected {% endif %}>Logistic Regression (only prediction)</option>
+      <option value="SVM" {% if model =="SVM" %} selected {% endif %}>  Support Vector Machine (only prediction) </option> -->
       <option value="XGB" {% if model =="XGB" %} selected {% endif %}>  XGBoost (only prediction) </option> 
-      <option value="LR_explainer" {% if model =="LR_explainer" %} selected {% endif %}>Logistic Regression (with explainer)</option>
-      <option value="SVM_explainer" {% if model =="SVM_explainer" %} selected {% endif %}>  Support Vector Machine (with explainer) </option>
+<!--       <option value="LR_explainer" {% if model =="LR_explainer" %} selected {% endif %}>Logistic Regression (with explainer)</option>
+      <option value="SVM_explainer" {% if model =="SVM_explainer" %} selected {% endif %}>  Support Vector Machine (with explainer) </option> -->
       <option value="XGB_explainer" {% if model =="XGB_explainer" %} selected {% endif %}>  XGBoost (with explainer) </option> 
 
     </select>
