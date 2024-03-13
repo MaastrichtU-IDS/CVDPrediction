@@ -8,6 +8,11 @@ services:
       VIRTUAL_PORT: 5001
       VIRTUAL_HOST: cvd-predictor.137.120.31.148.nip.io
       LETSENCRYPT_HOST: cvd-predictor.137.120.31.148.nip.io
+      HTTP_PROXY: http://proxy.unimaas.nl:3128
+      HTTPS_PROXY: http://proxy.unimaas.nl:3128
+      http_proxy: http://proxy.unimaas.nl:3128
+      https_proxy: http://proxy.unimaas.nl:3128
+      NO_PROXY: 127.0.0.1,localhost,137.120.0.0/16
     volumes:
       - ./:/app/
     # ports:
